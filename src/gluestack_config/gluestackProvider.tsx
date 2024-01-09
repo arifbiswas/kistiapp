@@ -1,26 +1,21 @@
 import React from 'react';
-
+import {createProvider} from '@gluestack-ui/provider';
+import {StyledProvider} from '@gluestack-style/react';
+import {OverlayProvider} from '@gluestack-ui/overlay';
+import {ToastProvider} from '@gluestack-ui/toast';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {config} from '@gluestack-ui/config';
-import {GluestackUIProvider} from '@gluestack-ui/themed';
 
-function GlueStackProvider({children}: any): JSX.Element {
-  const backgroundStyle = {
-    backgroundColor: Colors.white,
-    // height: '100%',
-  };
+const GluestackUIStyledProvider = createProvider({StyledProvider});
 
-  return <GluestackUIProvider config={config}>{children}</GluestackUIProvider>;
+function GlueStackProvider({children, ...props}: any): JSX.Element {
+  return (
+    <GluestackUIStyledProvider config={config}>
+      <OverlayProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </OverlayProvider>
+    </GluestackUIStyledProvider>
+  );
 }
 
 export default GlueStackProvider;
-
-// <SafeAreaView style={backgroundStyle}>
-{
-  /* <StatusBar
-      // barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      // barStyle={'light-content'}
-      // backgroundColor={globalStyle.primary}
-      /> */
-}
-// </SafeAreaView>

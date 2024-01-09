@@ -3,8 +3,8 @@ import Realm, {ObjectSchema} from 'realm';
 import {createRealmContext} from '@realm/react';
 import Routes from '../routes/Routes';
 
-// Define your object model
-class Loaners extends Realm.Object<Loaners> {
+// Loaner Modal
+class Loaner extends Realm.Object<Loaner> {
   _id!: Realm.BSON.ObjectId;
   name!: string;
   fatherName!: string;
@@ -18,6 +18,11 @@ class Loaners extends Realm.Object<Loaners> {
   referName!: string;
   referAddress!: string;
   referMobile!: number;
+  day!: number;
+  month!: number;
+  year!: number;
+  createdAt!: Date;
+  updatedAt!: Date;
 
   static schema: ObjectSchema = {
     name: 'Loaner',
@@ -32,9 +37,39 @@ class Loaners extends Realm.Object<Loaners> {
       loanAmount: 'int',
       profit: 'int',
       extraCharge: 'int',
+      loanLead: 'int',
       referName: 'string',
       referAddress: 'string',
       referMobile: 'int',
+      day: 'int',
+      month: 'int',
+      year: 'int',
+      createdAt: 'date',
+      updatedAt: 'date',
+    },
+    primaryKey: '_id',
+  };
+}
+// Blance Modal
+class Balance extends Realm.Object<Balance> {
+  _id!: Realm.BSON.ObjectId;
+  balance!: number;
+  day!: number;
+  month!: number;
+  year!: number;
+  createdAt!: Date;
+  updatedAt!: Date;
+
+  static schema: ObjectSchema = {
+    name: 'Balance',
+    properties: {
+      _id: 'objectId',
+      balance: 'int',
+      day: 'int',
+      month: 'int',
+      year: 'int',
+      createdAt: 'date',
+      updatedAt: 'date',
     },
     primaryKey: '_id',
   };
@@ -42,18 +77,19 @@ class Loaners extends Realm.Object<Loaners> {
 
 // Create a configuration object
 const realmConfig: Realm.Configuration = {
-  schema: [Loaners],
+  schema: [Loaner, Balance],
 };
 
 // Create a realm context
-export const realmContext = createRealmContext(realmConfig);
+export const {RealmProvider, useObject, useQuery, useRealm} =
+  createRealmContext(realmConfig);
 
 // Expose a realm
 function AppWrapper() {
   return (
-    <realmContext.RealmProvider>
+    <RealmProvider>
       <Routes />
-    </realmContext.RealmProvider>
+    </RealmProvider>
   );
 }
 

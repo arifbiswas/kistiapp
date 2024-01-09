@@ -29,117 +29,74 @@ const HomeScreen = ({navigation}: any) => {
   return (
     <GlueStackProvider>
       <Box height={'100%'} bg="$white">
-        <Center height={'43%'}>
-          <Box
-            width={'100%'}
-            height={'100%'}
-            bgColor="$teal600"
-            softShadow="1"
-            borderBottomEndRadius={10}
-            borderBottomStartRadius={10}>
-            {/* setting start*/}
-            <HStack
-              pt="$1"
-              pb="$4"
-              mx={'2%'}
-              justifyContent="space-between"
-              gap="$1"
-              alignItems="center">
-              <Text color="$white">{banglaDate}</Text>
-              <TouchableOpacity>
-                <HStack
-                  px={'$1'}
-                  justifyContent="flex-end"
-                  gap="$1"
-                  alignItems="center">
-                  <Icon as={SettingsIcon} color="$white" size="lg" />
-                  <Text color="$white" fontWeight="semibold">
-                    সেটিং
-                  </Text>
-                  {/* setting end*/}
-                </HStack>
-              </TouchableOpacity>
+        <Box
+          width={'100%'}
+          height={'39%'}
+          bgColor="$teal600"
+          softShadow="1"
+          px={'2%'}
+          borderBottomEndRadius={10}
+          borderBottomStartRadius={10}>
+          {/* setting start*/}
+          <HStack
+            pt="$1"
+            pb="$6"
+            justifyContent="space-between"
+            gap="$1"
+            alignItems="center">
+            <Text color="$white">{banglaDate}</Text>
+            <TouchableOpacity>
+              <HStack
+                px={'$1'}
+                justifyContent="flex-end"
+                gap="$1"
+                alignItems="center">
+                <Icon as={SettingsIcon} color="$white" size="lg" />
+                <Text color="$white" fontWeight="semibold">
+                  সেটিং
+                </Text>
+                {/* setting end*/}
+              </HStack>
+            </TouchableOpacity>
+          </HStack>
+          <Center mx={'2%'}>
+            <HStack gap="$7">
+              <Text color="$white">সদস্য : 5 জন</Text>
+              <Box h="$6">
+                <Divider orientation="vertical" bgColor="$teal700" />
+              </Box>
+              <Text color="$white">লাভ : 500</Text>
+              <Box h="$6">
+                <Divider orientation="vertical" bgColor="$teal700" />
+              </Box>
+              <Text color="$white">ক্ষতি : 50 </Text>
             </HStack>
-            <Center>
-              <HStack gap="$7">
-                <Text color="$white">সদস্য : 5 জন</Text>
-                <Box h="$6">
-                  <Divider orientation="vertical" />
-                </Box>
-                <Text color="$white">লাভ : ৳৫০০</Text>
-                <Box h="$6">
-                  <Divider orientation="vertical" />
-                </Box>
-                <Text color="$white">ক্ষতি : (-)৳৫০০</Text>
-              </HStack>
-            </Center>
+          </Center>
 
-            <Box
-              mx="4%"
-              borderBottomColor="$coolGray100"
-              borderBottomWidth="$1"
-              style={{
-                borderStyle: 'dashed',
-              }}>
-              <HStack
-                alignItems="center"
-                pt="$2"
-                justifyContent="space-between">
-                <Text size="lg" color="$white" fontWeight="bold">
-                  ব্যালেন্স :{' '}
-                </Text>
-                <Heading size="2xl" color="$white">
-                  ৳১০০০০
-                </Heading>
-              </HStack>
-              {/* debt start*/}
+          <Box mx="4%">
+            <HStack alignItems="center" pt="$2" justifyContent="space-between">
+              <Text size="4xl" color="$white" fontWeight="bold">
+                ব্যালেন্স :{' '}
+              </Text>
+              <Heading size="4xl" color="$white">
+                140000
+              </Heading>
+            </HStack>
+            {/* debt start*/}
 
-              <HStack
-                alignItems="center"
-                // pb="$1"
-                justifyContent="space-between">
-                <Text size="md" color="$white" fontWeight="bold">
-                  পাওনা :{' '}
-                </Text>
-                <Heading size="lg" color="$white">
-                  ৳১০০০০
-                </Heading>
-              </HStack>
-              <HStack
-                alignItems="center"
-                // pb="$1"
-                justifyContent="space-between">
-                <Text size="md" color="$white" fontWeight="bold">
-                  বই জমা :{' '}
-                </Text>
-                <Heading size="lg" color="$white">
-                  ৳৫০০
-                </Heading>
-              </HStack>
-              <HStack
-                alignItems="center"
-                // pb="$1"
-                justifyContent="space-between">
-                <Text size="lg" color="$white" fontWeight="bold">
-                  লাভ :{' '}
-                </Text>
-                <Heading size="lg" color="$white">
-                  ৳৫০০
-                </Heading>
-              </HStack>
-              <HStack
-                alignItems="center"
-                pb="$2"
-                justifyContent="space-between">
-                <Text size="lg" color="$white" fontWeight="bold">
-                  ক্ষতি :{' '}
-                </Text>
-                <Heading size="lg" color="$white">
-                  - ৳৫০০
-                </Heading>
-              </HStack>
-            </Box>
-            <Box mx="4%" pt="$1">
+            <HStack
+              alignItems="center"
+              // pb="$1"
+              justifyContent="space-between">
+              <Text size="4xl" color="$white" fontWeight="bold">
+                পাওনা :{' '}
+              </Text>
+              <Heading size="4xl" color="$white">
+                15000
+              </Heading>
+            </HStack>
+          </Box>
+          {/* <Box mx="4%" pt="$1">
               <HStack
                 alignItems="center"
                 // pb="$2"
@@ -151,9 +108,22 @@ const HomeScreen = ({navigation}: any) => {
                   ৳২০০০০
                 </Heading>
               </HStack>
-            </Box>
-          </Box>
-        </Center>
+            </Box> */}
+          <Center>
+            <HStack gap="$7">
+              <Text color="$white"> বই জমা : 500</Text>
+              <Box h="$6">
+                <Divider orientation="vertical" bgColor="$teal700" />
+              </Box>
+              <Text color="$white">মোট : 1550000</Text>
+              {/* <Box h="$6">
+                <Divider orientation="vertical" bgColor="$teal700" />
+              </Box>
+              <Text color="$white">ক্ষতি : (-)৳ 50</Text> */}
+            </HStack>
+          </Center>
+        </Box>
+
         <HStack mt="$12" mx="4%" justifyContent="space-between">
           <TouchableOpacity onPress={() => navigation.navigate('User')}>
             <VStack alignItems="center">
@@ -172,7 +142,7 @@ const HomeScreen = ({navigation}: any) => {
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Balance')}>
             <VStack alignItems="center">
               <Box
                 h="$16"

@@ -10,7 +10,22 @@ export interface ILoner {
   loanAmount: number;
   profit: number;
   extraCharge: number;
+  loanLead: number;
   referName: string;
   referAddress: string;
   referMobile: number;
+  day?: number;
+  month?: number;
+  year?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+export interface IBalance {
+  _id?: Realm.BSON.ObjectId;
+  balance: number;
+  day?: number;
+  month?: number;
+  year?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

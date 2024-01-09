@@ -6,6 +6,7 @@ import HomeScreen from '../screens/home/HomeScreen';
 import {GColors} from '../Styles/GColors';
 import UserScreen from '../screens/users/UserScreen';
 import UserDetailsScreen from '../screens/users/UserDetailsScreen';
+import BalanceScreen from '../screens/balance/BalanceScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,13 @@ function Routes() {
         <Stack.Screen
           name="UserDetails"
           component={UserDetailsScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Balance"
+          component={BalanceScreen}
           options={{
             headerShown: false,
           }}

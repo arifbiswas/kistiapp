@@ -1,5 +1,6 @@
-import {TouchableOpacity} from 'react-native';
 import React from 'react';
+import {TouchableOpacity, ToastAndroid} from 'react-native';
+
 import {
   Avatar,
   AvatarFallbackText,
@@ -14,6 +15,9 @@ import {
   Icon,
   InputField,
   ScrollView,
+  Menu,
+  MenuItem,
+  MenuItemLabel,
 } from '@gluestack-ui/themed';
 import GlueStackProvider from '../../gluestack_config/gluestackProvider';
 import HeaderPlusBack from '../../components/HeaderPlusBack';
@@ -22,92 +26,173 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomModal from '../../components/customModal/CustomModal';
 import {Input} from '@gluestack-ui/themed';
 import {ILoner} from '../../types/interface';
-import {realmContext} from '../../realm/realm';
-
-const realmX = realmContext;
+import {useQuery, useRealm} from '../../realm/realm';
+import Realm from 'realm';
+import {GColors} from '../../Styles/GColors';
 
 const UserScreen = ({navigation}: any) => {
   const [modal, setModal] = React.useState(false);
-  const realm = realmX.useRealm();
+  const realm = useRealm();
+  const AllLoaner = useQuery('Loaner');
+
   const [data, setData] = React.useState({
-    address: '',
-    extraCharge: 0,
-    fatherName: '',
-    loanAmount: 0,
-    mobile: 0,
-    motherName: '',
-    name: '',
-    nid: 0,
-    profit: 0,
-    referAddress: '',
-    referMobile: 0,
-    referName: '',
+    address: '১২৬/১ মিরহাজীরবাগ',
+    extraCharge: 150,
+    fatherName: 'ইউনুছ বিশ্বাস',
+    loanAmount: 5000,
+    mobile: 1871063074,
+    motherName: 'মোর্শেদা বেগম',
+    name: 'আরিফ বিশ্বাস',
+    nid: 46416414654,
+    profit: 1500,
+    loanLead: 12,
+    day: Number(new Date().toLocaleDateString().split('/')[0]),
+    month: Number(new Date().toLocaleDateString().split('/')[1]),
+    year: Number(new Date().toLocaleDateString().split('/')[2]),
+    referAddress: '১৫০ মিরহাজীবাগ',
+    referMobile: 1871063074,
+    referName: 'আলি ভাই',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
+
   const saveNewLoner = React.useCallback(
     async (loneData: ILoner) => {
-      console.log(loneData);
-      loneData._id = new Realm.BSON.ObjectId();
-      // realm.write(() => {
-      //   realm.create('Loner', loneData);
-      // });
+      // console.log(loneData);
+
+      try {
+        realm.write(() => {
+          realm.create('Loaner', {
+            _id: new Realm.BSON.ObjectId(),
+            ...loneData,
+          });
+        });
+
+        ToastAndroid.showWithGravity(
+          `${loneData.name} এর ঋণ সংযোগ করা হইছে`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        setModal(false);
+      } catch (error) {
+        console.log(error);
+      }
     },
     [data],
   );
+
+  console.log(AllLoaner);
+
   return (
     <GlueStackProvider>
       <Box h="100%" position="relative">
         <HeaderPlusBack />
         <Box my="$2" px="$3">
           <Text color="$teal600" size="sm">
-            মোট সদস্য : 5
+            মোট সদস্য : {AllLoaner.length}
           </Text>
         </Box>
         <ScrollView>
-          <TouchableOpacity onPress={() => navigation.navigate('UserDetails')}>
-            <HStack
-              my="$1"
-              mx="2%"
-              borderColor="$teal300"
-              borderWidth="$1"
-              p="$1"
-              rounded="$md"
-              alignItems="center"
-              justifyContent="space-between">
-              <HStack gap="$3" alignItems="center" my="$1">
-                <Avatar
-                  bgColor="$teal600"
-                  style={{
-                    width: 55,
-                    height: 55,
-                  }}>
-                  <AvatarFallbackText>আ</AvatarFallbackText>
-                  {/* <AvatarImage
+          <Box pb="$16">
+            {AllLoaner.length !== 0 ? (
+              <>
+                {AllLoaner.map(item => (
+                  <TouchableOpacity
+                    key={item?._id}
+                    onPress={() => navigation.navigate('UserDetails', item)}>
+                    <HStack
+                      my="$1"
+                      mx="2%"
+                      borderColor="$teal600"
+                      borderWidth="$1"
+                      p="$1"
+                      rounded="$md"
+                      alignItems="center"
+                      justifyContent="space-between">
+                      <HStack gap="$3" alignItems="center" my="$1">
+                        <Avatar
+                          bgColor="$teal600"
+                          style={{
+                            width: 55,
+                            height: 55,
+                          }}>
+                          <AvatarFallbackText>
+                            {item?.name.slice(0, 1)}
+                          </AvatarFallbackText>
+                          {/* <AvatarImage
                     source={{
                       uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=80&q=60',
                     }}
                     alt="name"
                   /> */}
-                </Avatar>
-                <VStack gap="-$1">
-                  <Text size="sm" color="$coolGray600" fontWeight="bold">
-                    আরিফ বিশ্বাস জয়
-                  </Text>
-                  <Text size="sm" color="$coolGray600">
-                    ১২৬/১ মীরহাজীরবাগ ঢাকা-১২০৪
-                  </Text>
-                  <Text size="sm" color="$coolGray600">
-                    ০১৮৭১০৬৩০৭৪
-                  </Text>
-                </VStack>
-              </HStack>
-              <TouchableOpacity
-                style={{
-                  padding: 5,
-                }}>
-                <Entypo name="dots-three-vertical" size={20} />
-              </TouchableOpacity>
-            </HStack>
-          </TouchableOpacity>
+                        </Avatar>
+                        <VStack gap="-$1">
+                          <Text size="sm" color="$teal600" fontWeight="bold">
+                            {item?.name}
+                          </Text>
+                          <Text size="sm" color="$coolGray600">
+                            {item?.address}
+                          </Text>
+                          <Text size="sm" color="$coolGray600">
+                            {item.mobile}
+                          </Text>
+                        </VStack>
+                      </HStack>
+
+                      <Menu
+                        placement="top right"
+                        // top={-20}
+                        offset={-20}
+                        // selectionMode="multiple"
+
+                        trigger={({...triggerProps}) => {
+                          return (
+                            <TouchableOpacity
+                              {...triggerProps}
+                              style={{
+                                padding: 5,
+                              }}>
+                              <Entypo
+                                name="dots-three-vertical"
+                                size={20}
+                                color={GColors.primary}
+                              />
+                            </TouchableOpacity>
+                          );
+                        }}>
+                        <MenuItem key="Community" textValue="Community">
+                          <MenuItemLabel size="md">Community</MenuItemLabel>
+                        </MenuItem>
+                        <MenuItem key="Plugins" textValue="Plugins">
+                          <MenuItemLabel size="md">Plugins</MenuItemLabel>
+                        </MenuItem>
+                        <MenuItem key="Theme" textValue="Theme">
+                          <MenuItemLabel size="md">Theme</MenuItemLabel>
+                        </MenuItem>
+                        <MenuItem key="Settings" textValue="Settings">
+                          <MenuItemLabel size="md">Settings</MenuItemLabel>
+                        </MenuItem>
+                        <MenuItem key="Add account" textValue="Add account">
+                          <MenuItemLabel size="md">Add account</MenuItemLabel>
+                        </MenuItem>
+                      </Menu>
+                    </HStack>
+                  </TouchableOpacity>
+                ))}
+              </>
+            ) : (
+              <Box my="$4">
+                <Text
+                  size="md"
+                  textAlign="center"
+                  color="$teal800"
+                  fontWeight="bold"
+                  opacity="$25">
+                  কাউকে পাওয়া যাইনি , নতুন সংযোগ করুন
+                </Text>
+              </Box>
+            )}
+          </Box>
         </ScrollView>
 
         <TouchableOpacity
@@ -164,70 +249,89 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="নাম"
-                    onChangeText={text => setData({...data, name: text})}
                     keyboardType="default"
                     textContentType="none"
+                    onChangeText={text => setData({...data, name: text})}
+                    value={data.name}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="পিতার নাম"
                     onChangeText={text => setData({...data, fatherName: text})}
+                    value={data.fatherName}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="মাতার নাম"
                     onChangeText={text => setData({...data, motherName: text})}
+                    value={data.motherName}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="ঠিকানা"
                     onChangeText={text => setData({...data, address: text})}
+                    value={data.address}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="মোবাইল"
+                    keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, mobile: Number(text)})
                     }
-                    keyboardType="number-pad"
+                    value={`${data.mobile}`}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="এন আইডি"
+                    keyboardType="numeric"
                     onChangeText={text => setData({...data, nid: Number(text)})}
-                    keyboardType="number-pad"
+                    value={`${data.nid}`}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="ঋনের পরিমান"
+                    keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, loanAmount: Number(text)})
                     }
-                    keyboardType="number-pad"
+                    value={`${data.loanAmount}`}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="লাভ"
+                    keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, profit: Number(text)})
                     }
-                    keyboardType="number-pad"
+                    value={`${data.profit}`}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="বই জমা"
+                    keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, extraCharge: Number(text)})
                     }
-                    keyboardType="number-pad"
+                    value={`${data.extraCharge}`}
+                  />
+                </Input>
+                <Input size="lg">
+                  <InputField
+                    placeholder="কত কিস্তিতে?"
+                    keyboardType="numeric"
+                    onChangeText={text =>
+                      setData({...data, loanLead: Number(text)})
+                    }
+                    value={`${data.loanLead}`}
                   />
                 </Input>
                 <Text
@@ -241,24 +345,29 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="নাম"
+                    keyboardType="numeric"
                     onChangeText={text => setData({...data, referName: text})}
+                    value={`${data.referName}`}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="ঠিকানা"
+                    keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, referAddress: text})
                     }
+                    value={`${data.referAddress}`}
                   />
                 </Input>
                 <Input size="lg">
                   <InputField
                     placeholder="মোবাইল"
+                    keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, referMobile: Number(text)})
                     }
-                    keyboardType="number-pad"
+                    value={`${data.referMobile}`}
                   />
                 </Input>
               </VStack>
