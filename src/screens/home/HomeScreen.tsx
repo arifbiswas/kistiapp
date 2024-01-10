@@ -21,10 +21,33 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {getDate, getDay, getMonth, getWeekDay, getYear} from 'bangla-calendar';
 import {useNavigation} from '@react-navigation/native';
+import {useQuery} from '../../realm/realm';
 
 const HomeScreen = ({navigation}: any) => {
+  const allLoaner = useQuery('Loaner');
+  const allBalance = useQuery('Balance');
   let today = new Date();
   const banglaDate = getDate(today);
+
+  const totalBalance = allBalance.reduce(
+    (preBalance, currentBalance) => preBalance + currentBalance?.balance,
+    0,
+  );
+
+  const totalProfit = allLoaner.reduce(
+    (preValue, currentValue) => preValue + currentValue?.profit,
+    0,
+  );
+  const totalLoanAmount = allLoaner.reduce(
+    (preValue, currentValue) => preValue + currentValue?.loanAmount,
+    0,
+  );
+  const totalExtraAmount = allLoaner.reduce(
+    (preValue, currentValue) => preValue + currentValue?.extraCharge,
+    0,
+  );
+
+  // console.log(totalExtraAmount);
 
   return (
     <GlueStackProvider>
@@ -61,11 +84,11 @@ const HomeScreen = ({navigation}: any) => {
           </HStack>
           <Center mx={'2%'}>
             <HStack gap="$7">
-              <Text color="$white">সদস্য : 5 জন</Text>
+              <Text color="$white">সদস্য : {allLoaner.length} জন</Text>
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">লাভ : 500</Text>
+              <Text color="$white">লাভ : {totalProfit}</Text>
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
@@ -73,13 +96,13 @@ const HomeScreen = ({navigation}: any) => {
             </HStack>
           </Center>
 
-          <Box mx="4%">
+          <VStack mx="4%" gap="-$3">
             <HStack alignItems="center" pt="$2" justifyContent="space-between">
               <Text size="4xl" color="$white" fontWeight="bold">
                 ব্যালেন্স :{' '}
               </Text>
               <Heading size="4xl" color="$white">
-                140000
+                {totalBalance - totalLoanAmount}
               </Heading>
             </HStack>
             {/* debt start*/}
@@ -92,10 +115,10 @@ const HomeScreen = ({navigation}: any) => {
                 পাওনা :{' '}
               </Text>
               <Heading size="4xl" color="$white">
-                15000
+                {totalLoanAmount}
               </Heading>
             </HStack>
-          </Box>
+          </VStack>
           {/* <Box mx="4%" pt="$1">
               <HStack
                 alignItems="center"
@@ -109,13 +132,13 @@ const HomeScreen = ({navigation}: any) => {
                 </Heading>
               </HStack>
             </Box> */}
-          <Center>
+          <Center mt="$3">
             <HStack gap="$7">
-              <Text color="$white"> বই জমা : 500</Text>
+              <Text color="$white"> বই জমা : {totalExtraAmount}</Text>
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">মোট : 1550000</Text>
+              <Text color="$white">মোট : {totalBalance}</Text>
               {/* <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>

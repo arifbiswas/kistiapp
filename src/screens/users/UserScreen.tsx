@@ -18,6 +18,7 @@ import {
   Menu,
   MenuItem,
   MenuItemLabel,
+  View,
 } from '@gluestack-ui/themed';
 import GlueStackProvider from '../../gluestack_config/gluestackProvider';
 import HeaderPlusBack from '../../components/HeaderPlusBack';
@@ -32,6 +33,8 @@ import {GColors} from '../../Styles/GColors';
 
 const UserScreen = ({navigation}: any) => {
   const [modal, setModal] = React.useState(false);
+  const [menuModal, setMenuModal] = React.useState(false);
+  const [selectItem, setSelectItem] = React.useState({});
   const realm = useRealm();
   const AllLoaner = useQuery('Loaner');
 
@@ -80,8 +83,29 @@ const UserScreen = ({navigation}: any) => {
     },
     [data],
   );
+  const deleteHandler = React.useCallback(
+    async (loneData: ILoner) => {
+      // console.log(loneData);
 
-  console.log(AllLoaner);
+      try {
+        realm.write(() => {
+          realm.delete(loneData);
+        });
+
+        ToastAndroid.showWithGravity(
+          `ডিলেট সফল হইছে`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        setModal(false);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [data],
+  );
+
+  // console.log([...Array(5)]);
 
   return (
     <GlueStackProvider>
@@ -138,44 +162,20 @@ const UserScreen = ({navigation}: any) => {
                           </Text>
                         </VStack>
                       </HStack>
-
-                      <Menu
-                        placement="top right"
-                        // top={-20}
-                        offset={-20}
-                        // selectionMode="multiple"
-
-                        trigger={({...triggerProps}) => {
-                          return (
-                            <TouchableOpacity
-                              {...triggerProps}
-                              style={{
-                                padding: 5,
-                              }}>
-                              <Entypo
-                                name="dots-three-vertical"
-                                size={20}
-                                color={GColors.primary}
-                              />
-                            </TouchableOpacity>
-                          );
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectItem(item);
+                          setMenuModal(!menuModal);
+                        }}
+                        style={{
+                          padding: 5,
                         }}>
-                        <MenuItem key="Community" textValue="Community">
-                          <MenuItemLabel size="md">Community</MenuItemLabel>
-                        </MenuItem>
-                        <MenuItem key="Plugins" textValue="Plugins">
-                          <MenuItemLabel size="md">Plugins</MenuItemLabel>
-                        </MenuItem>
-                        <MenuItem key="Theme" textValue="Theme">
-                          <MenuItemLabel size="md">Theme</MenuItemLabel>
-                        </MenuItem>
-                        <MenuItem key="Settings" textValue="Settings">
-                          <MenuItemLabel size="md">Settings</MenuItemLabel>
-                        </MenuItem>
-                        <MenuItem key="Add account" textValue="Add account">
-                          <MenuItemLabel size="md">Add account</MenuItemLabel>
-                        </MenuItem>
-                      </Menu>
+                        <Entypo
+                          name="dots-three-vertical"
+                          size={20}
+                          color={GColors.primary}
+                        />
+                      </TouchableOpacity>
                     </HStack>
                   </TouchableOpacity>
                 ))}
@@ -218,6 +218,98 @@ const UserScreen = ({navigation}: any) => {
             </Text>
           </HStack>
         </TouchableOpacity>
+
+        {/*------------------- menu item modal ----------------------- */}
+        <CustomModal
+          Radius={15}
+          modalVisible={menuModal}
+          setModalVisible={setMenuModal}
+          backButton={true}
+          height="40%"
+          width="65%"
+          // appearance={true}
+        >
+          <>
+            <Box gap="$1">
+              <TouchableOpacity>
+                <View
+                  bgColor="$teal600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    কল
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View
+                  bgColor="$teal600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    এডিট
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View
+                  bgColor="$teal600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    সাপ্তাহিক জমা
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  deleteHandler(selectItem);
+                  setMenuModal(false);
+                }}>
+                <View
+                  bgColor="$red600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    ডিলেট
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View
+                  bgColor="$red600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    পাওয়া যাবে না (ক্ষতি)
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </Box>
+          </>
+        </CustomModal>
+
+        {/*--------------- new add modal -------------------- */}
         <CustomModal
           Radius={15}
           modalVisible={modal}
@@ -250,6 +342,7 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="নাম"
                     keyboardType="default"
+                    size="sm"
                     textContentType="none"
                     onChangeText={text => setData({...data, name: text})}
                     value={data.name}
@@ -258,6 +351,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="পিতার নাম"
+                    size="sm"
                     onChangeText={text => setData({...data, fatherName: text})}
                     value={data.fatherName}
                   />
@@ -265,6 +359,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="মাতার নাম"
+                    size="sm"
                     onChangeText={text => setData({...data, motherName: text})}
                     value={data.motherName}
                   />
@@ -272,6 +367,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="ঠিকানা"
+                    size="sm"
                     onChangeText={text => setData({...data, address: text})}
                     value={data.address}
                   />
@@ -279,6 +375,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="মোবাইল"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, mobile: Number(text)})
@@ -289,6 +386,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="এন আইডি"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text => setData({...data, nid: Number(text)})}
                     value={`${data.nid}`}
@@ -297,6 +395,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="ঋনের পরিমান"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, loanAmount: Number(text)})
@@ -307,6 +406,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="লাভ"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, profit: Number(text)})
@@ -317,6 +417,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="বই জমা"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, extraCharge: Number(text)})
@@ -327,6 +428,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="কত কিস্তিতে?"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, loanLead: Number(text)})
@@ -345,6 +447,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="নাম"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text => setData({...data, referName: text})}
                     value={`${data.referName}`}
@@ -353,6 +456,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="ঠিকানা"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, referAddress: text})
@@ -363,6 +467,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="মোবাইল"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, referMobile: Number(text)})

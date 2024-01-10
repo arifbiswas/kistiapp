@@ -18,6 +18,7 @@ import {
   Menu,
   MenuItem,
   MenuItemLabel,
+  View,
 } from '@gluestack-ui/themed';
 import GlueStackProvider from '../../gluestack_config/gluestackProvider';
 import HeaderPlusBack from '../../components/HeaderPlusBack';
@@ -33,7 +34,8 @@ import {Divider} from '@gluestack-ui/themed';
 
 const BalanceScreen = ({navigation}: any) => {
   const [modal, setModal] = React.useState(false);
-
+  const [menuModal, setMenuModal] = React.useState(false);
+  const [selectItem, setSelectItem] = React.useState({});
   const realm = useRealm();
 
   const AllBalance = useQuery('Balance');
@@ -132,12 +134,11 @@ const BalanceScreen = ({navigation}: any) => {
                       justifyContent="space-between">
                       <HStack gap="$3" alignItems="center" my="$1">
                         <VStack gap="-$1">
-                          <HStack>
+                          <HStack py="$1" alignItems="center">
                             <Text
                               size="md"
                               color="$coolGray500"
-                              fontWeight="bold"
-                              py="$1">
+                              fontWeight="bold">
                               ব্যালেন্স : {''}
                             </Text>
                             <Text size="md" color="$teal600" fontWeight="bold">
@@ -149,38 +150,21 @@ const BalanceScreen = ({navigation}: any) => {
                           </Text>
                         </VStack>
                       </HStack>
-                      <Box maxWidth={50}>
-                        <Menu
-                          placement="top right"
-                          // top={-20}
-                          offset={-20}
-                          // selectionMode="multiple"
 
-                          trigger={({...triggerProps}) => {
-                            return (
-                              <TouchableOpacity
-                                {...triggerProps}
-                                style={{
-                                  padding: 5,
-                                }}>
-                                <Entypo
-                                  name="dots-three-vertical"
-                                  size={20}
-                                  color={GColors.primary}
-                                />
-                              </TouchableOpacity>
-                            );
-                          }}>
-                          <MenuItem
-                            onPress={() => deleteHandler(item)}
-                            key="delete"
-                            textValue="delete">
-                            <MenuItemLabel size="md" color="$red600">
-                              ডিলেট
-                            </MenuItemLabel>
-                          </MenuItem>
-                        </Menu>
-                      </Box>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setSelectItem(item);
+                          setMenuModal(true);
+                        }}
+                        style={{
+                          padding: 5,
+                        }}>
+                        <Entypo
+                          name="dots-three-vertical"
+                          size={20}
+                          color={GColors.primary}
+                        />
+                      </TouchableOpacity>
                     </HStack>
                   </Box>
                 ))}
@@ -224,15 +208,65 @@ const BalanceScreen = ({navigation}: any) => {
             </Text>
           </HStack>
         </TouchableOpacity>
+        {/*------------------- menu item modal ----------------------- */}
+        <CustomModal
+          Radius={15}
+          modalVisible={menuModal}
+          setModalVisible={setMenuModal}
+          backButton={true}
+          height="20%"
+          width="65%"
+          // appearance={true}
+        >
+          <>
+            <Box gap="$1">
+              <TouchableOpacity>
+                <View
+                  bgColor="$teal600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    এডিট
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  deleteHandler(selectItem);
+                  setMenuModal(false);
+                }}>
+                <View
+                  bgColor="$red600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    ডিলেট
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </Box>
+          </>
+        </CustomModal>
+
+        {/*--------------- new add modal -------------------- */}
         <CustomModal
           Radius={15}
           modalVisible={modal}
           setModalVisible={setModal}
           backButton={true}
-          height="50%"
+          height="40%"
           appearance={true}>
           <>
-            <Box>
+            {/* <Box>
               <Center>
                 <Image
                   source={require('../../../assets/adduser.png')}
@@ -241,7 +275,7 @@ const BalanceScreen = ({navigation}: any) => {
                   h="$16"
                 />
               </Center>
-            </Box>
+            </Box> */}
             <ScrollView my="$2" showsVerticalScrollIndicator={false}>
               <Text
                 color="$coolGray500"
@@ -255,6 +289,7 @@ const BalanceScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="মোবাইল"
+                    size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, balance: Number(text)})
