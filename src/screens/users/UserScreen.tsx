@@ -26,17 +26,20 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomModal from '../../components/customModal/CustomModal';
 import {Input} from '@gluestack-ui/themed';
-import {ILoner} from '../../types/interface';
-import {useQuery, useRealm} from '../../realm/realm';
+import {IBalance, ILoner, ITotals} from '../../types/interface';
+import {useObject, useQuery, useRealm} from '../../realm/realm';
 import Realm from 'realm';
 import {GColors} from '../../Styles/GColors';
 
 const UserScreen = ({navigation}: any) => {
   const [modal, setModal] = React.useState(false);
   const [menuModal, setMenuModal] = React.useState(false);
-  const [selectItem, setSelectItem] = React.useState({});
+  const [selectItem, setSelectItem] = React.useState<ILoner>({});
   const realm = useRealm();
-  const AllLoaner = useQuery('Loaner');
+  const AllLoaner = useQuery<ILoner>('Loaner');
+
+  const totals = useQuery<ITotals>('Totals').find(item => item);
+  console.log(totals);
 
   const [data, setData] = React.useState({
     address: '১২৬/১ মিরহাজীরবাগ',
@@ -49,6 +52,7 @@ const UserScreen = ({navigation}: any) => {
     nid: 46416414654,
     profit: 1500,
     loanLead: 12,
+    loss: false,
     day: Number(new Date().toLocaleDateString().split('/')[0]),
     month: Number(new Date().toLocaleDateString().split('/')[1]),
     year: Number(new Date().toLocaleDateString().split('/')[2]),
@@ -62,8 +66,35 @@ const UserScreen = ({navigation}: any) => {
   const saveNewLoner = React.useCallback(
     async (loneData: ILoner) => {
       // console.log(loneData);
+      if (!totals) {
+        ToastAndroid.showWithGravity(
+          `ব্যালেন্স সংযোগ করুন`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        return;
+      } else if (
+        totals.totalBalance === 0 ||
+        totals?.totalBalance < 0 ||
+        totals?.totalBalance < loneData.loanAmount
+      ) {
+        ToastAndroid.showWithGravity(
+          `ব্যালেন্স নেই , আগে নতুন করে ব্যালেন্স সংযোগ করুন`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        return;
+      }
 
       try {
+        // console.log(allBalance);
+        realm.write(() => {
+          totals.totalBalance = totals.totalBalance - loneData.loanAmount;
+          totals.totalLoan = totals.totalLoan + loneData.loanAmount;
+          totals.totalProfit = totals.totalProfit + loneData.profit;
+          // totals.totalLoss = totals.totalProfit + loneData.;
+        });
+
         realm.write(() => {
           realm.create('Loaner', {
             _id: new Realm.BSON.ObjectId(),
@@ -97,12 +128,66 @@ const UserScreen = ({navigation}: any) => {
           ToastAndroid.LONG,
           ToastAndroid.CENTER,
         );
-        setModal(false);
+        setMenuModal(false);
       } catch (error) {
         console.log(error);
       }
     },
-    [data],
+    [selectItem],
+  );
+  const lossHandler = React.useCallback(
+    async (loneData: ILoner) => {
+      // console.log(loneData);
+      const single = realm.objectForPrimaryKey('Loaner', selectItem._id);
+      // console.log(single);
+
+      try {
+        realm.write(() => {
+          totals.totalLoss =
+            totals.totalLoss + (loneData.loanAmount + loneData.profit);
+        });
+        realm.write(() => {
+          single.loss = true;
+        });
+
+        ToastAndroid.showWithGravity(
+          `ক্ষতিতে সংযোগ করা হয়েছে`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        setMenuModal(false);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [selectItem],
+  );
+  const haveToHandler = React.useCallback(
+    async (loneData: ILoner) => {
+      // console.log(loneData);
+      const single = realm.objectForPrimaryKey('Loaner', selectItem._id);
+      // console.log(single);
+
+      try {
+        realm.write(() => {
+          totals.totalLoss =
+            totals.totalLoss - (loneData.loanAmount + loneData.profit);
+        });
+        realm.write(() => {
+          single.loss = false;
+        });
+
+        ToastAndroid.showWithGravity(
+          `পাওয়া যাবে`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+        setMenuModal(false);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [selectItem],
   );
 
   // console.log([...Array(5)]);
@@ -127,7 +212,7 @@ const UserScreen = ({navigation}: any) => {
                     <HStack
                       my="$1"
                       mx="2%"
-                      borderColor="$teal600"
+                      borderColor={item.loss ? '$red600' : '$teal600'}
                       borderWidth="$1"
                       p="$1"
                       rounded="$md"
@@ -135,7 +220,7 @@ const UserScreen = ({navigation}: any) => {
                       justifyContent="space-between">
                       <HStack gap="$3" alignItems="center" my="$1">
                         <Avatar
-                          bgColor="$teal600"
+                          bgColor={item.loss ? '$red600' : '$teal600'}
                           style={{
                             width: 55,
                             height: 55,
@@ -151,7 +236,10 @@ const UserScreen = ({navigation}: any) => {
                   /> */}
                         </Avatar>
                         <VStack gap="-$1">
-                          <Text size="sm" color="$teal600" fontWeight="bold">
+                          <Text
+                            size="sm"
+                            color={item.loss ? '$red600' : '$teal600'}
+                            fontWeight="bold">
                             {item?.name}
                           </Text>
                           <Text size="sm" color="$coolGray600">
@@ -162,6 +250,12 @@ const UserScreen = ({navigation}: any) => {
                           </Text>
                         </VStack>
                       </HStack>
+                      {item.loss && (
+                        <Text size="sm" fontWeight="$black" color="$red500">
+                          ক্ষতি
+                        </Text>
+                      )}
+
                       <TouchableOpacity
                         onPress={() => {
                           setSelectItem(item);
@@ -173,7 +267,7 @@ const UserScreen = ({navigation}: any) => {
                         <Entypo
                           name="dots-three-vertical"
                           size={20}
-                          color={GColors.primary}
+                          color={item.loss ? GColors.red : GColors.primary}
                         />
                       </TouchableOpacity>
                     </HStack>
@@ -291,20 +385,46 @@ const UserScreen = ({navigation}: any) => {
                   </Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity>
-                <View
-                  bgColor="$red600"
-                  p="$3"
-                  w="100%"
-                  h="$12"
-                  rounded="$md"
-                  justifyContent="center"
-                  alignItems="center">
-                  <Text size="md" color="$white" fontWeight="bold">
-                    পাওয়া যাবে না (ক্ষতি)
-                  </Text>
-                </View>
-              </TouchableOpacity>
+
+              {selectItem.loss ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    haveToHandler(selectItem);
+                    // setMenuModal(false);
+                  }}>
+                  <View
+                    bgColor="$green600"
+                    p="$3"
+                    w="100%"
+                    h="$12"
+                    rounded="$md"
+                    justifyContent="center"
+                    alignItems="center">
+                    <Text size="md" color="$white" fontWeight="bold">
+                      পাওয়া যাবে !
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    lossHandler(selectItem);
+                    // setMenuModal(false);
+                  }}>
+                  <View
+                    bgColor="$red600"
+                    p="$3"
+                    w="100%"
+                    h="$12"
+                    rounded="$md"
+                    justifyContent="center"
+                    alignItems="center">
+                    <Text size="md" color="$white" fontWeight="bold">
+                      পাওয়া যাবে না (ক্ষতি)
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
             </Box>
           </>
         </CustomModal>

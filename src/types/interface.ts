@@ -14,6 +14,7 @@ export interface ILoner {
   referName: string;
   referAddress: string;
   referMobile: number;
+  loss: boolean;
   day?: number;
   month?: number;
   year?: number;
@@ -28,4 +29,11 @@ export interface IBalance {
   year?: number;
   createdAt?: Date;
   updatedAt?: Date;
+}
+export interface ITotals {
+  _id?: Realm.BSON.ObjectId;
+  totalBalance?: number;
+  totalLoan?: number;
+  totalProfit?: number;
+  totalLoss?: number;
 }

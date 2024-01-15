@@ -7,6 +7,12 @@ import {GColors} from '../Styles/GColors';
 import UserScreen from '../screens/users/UserScreen';
 import UserDetailsScreen from '../screens/users/UserDetailsScreen';
 import BalanceScreen from '../screens/balance/BalanceScreen';
+import ProfitScreen from '../screens/profit/ProfitScreen';
+import LossScreen from '../screens/loss/LossScreen';
+import ReportScreen from '../screens/Report/ReportScreen';
+import MonthlyScreen from '../screens/Report/MonthlyScreen';
+import WeeklyScreen from '../screens/Report/WeeklyScreen';
+import CalculatorScreen from '../screens/calculator/CalculatorScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +54,48 @@ function Routes() {
         <Stack.Screen
           name="Balance"
           component={BalanceScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Profit"
+          component={ProfitScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Loss"
+          component={LossScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Report"
+          component={ReportScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ReportMonthly"
+          component={MonthlyScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ReportWeekly"
+          component={WeeklyScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Calculator"
+          component={CalculatorScreen}
           options={{
             headerShown: false,
           }}

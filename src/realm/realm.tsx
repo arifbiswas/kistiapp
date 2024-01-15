@@ -18,6 +18,7 @@ class Loaner extends Realm.Object<Loaner> {
   referName!: string;
   referAddress!: string;
   referMobile!: number;
+
   day!: number;
   month!: number;
   year!: number;
@@ -27,7 +28,7 @@ class Loaner extends Realm.Object<Loaner> {
   static schema: ObjectSchema = {
     name: 'Loaner',
     properties: {
-      _id: 'objectId',
+      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
       name: 'string',
       fatherName: 'string',
       motherName: 'string',
@@ -41,6 +42,7 @@ class Loaner extends Realm.Object<Loaner> {
       referName: 'string',
       referAddress: 'string',
       referMobile: 'int',
+      loss: 'bool',
       day: 'int',
       month: 'int',
       year: 'int',
@@ -63,13 +65,63 @@ class Balance extends Realm.Object<Balance> {
   static schema: ObjectSchema = {
     name: 'Balance',
     properties: {
-      _id: 'objectId',
+      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
       balance: 'int',
       day: 'int',
       month: 'int',
       year: 'int',
-      createdAt: 'date',
-      updatedAt: 'date',
+      createdAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+      updatedAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+    },
+    primaryKey: '_id',
+  };
+}
+// Blance Modal
+class Totals extends Realm.Object<Totals> {
+  _id!: Realm.BSON.ObjectId;
+
+  static schema: ObjectSchema = {
+    name: 'Totals',
+    properties: {
+      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      totalAmount: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalBalance: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalLoan: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalLoaner: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalProfit: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalLoss: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalExtraCharge: {
+        type: 'int',
+        default: () => 0,
+      },
+      totalComes: {
+        type: 'int',
+        default: () => 0,
+      },
     },
     primaryKey: '_id',
   };
@@ -77,7 +129,7 @@ class Balance extends Realm.Object<Balance> {
 
 // Create a configuration object
 const realmConfig: Realm.Configuration = {
-  schema: [Loaner, Balance],
+  schema: [Loaner, Balance, Totals],
 };
 
 // Create a realm context

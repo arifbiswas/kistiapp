@@ -26,7 +26,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomModal from '../../components/customModal/CustomModal';
 import {Input} from '@gluestack-ui/themed';
-import {IBalance, ILoner} from '../../types/interface';
+import {IBalance, ILoner, ITotals} from '../../types/interface';
 import {useObject, useQuery, useRealm} from '../../realm/realm';
 import Realm from 'realm';
 import {GColors} from '../../Styles/GColors';
@@ -39,6 +39,8 @@ const BalanceScreen = ({navigation}: any) => {
   const realm = useRealm();
 
   const AllBalance = useQuery('Balance');
+  const totals = useQuery<ITotals>('Totals').find(item => item);
+  console.log(totals);
 
   const [data, setData] = React.useState({
     balance: 500,
@@ -53,6 +55,24 @@ const BalanceScreen = ({navigation}: any) => {
       // console.log(loneData);
 
       try {
+        if (!totals?.totalBalance) {
+          realm.write(() => {
+            realm.create('Totals', {
+              _id: new Realm.BSON.ObjectId(),
+              totalBalance: balance.balance,
+              totalLoan: 0,
+              totalProfit: 0,
+              totalLoss: 0,
+            });
+          });
+        }
+
+        if (totals?.totalBalance || totals?.totalBalance === 0) {
+          realm.write(() => {
+            totals.totalBalance = totals.totalBalance + balance.balance;
+          });
+        }
+
         realm.write(() => {
           realm.create('Balance', {
             _id: new Realm.BSON.ObjectId(),
@@ -77,6 +97,10 @@ const BalanceScreen = ({navigation}: any) => {
       // console.log(loneData);
 
       try {
+        realm.write(() => {
+          totals.totalBalance = totals.totalBalance - balance.balance;
+        });
+
         realm.write(() => {
           realm.delete(balance);
         });

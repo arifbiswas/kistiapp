@@ -5,14 +5,17 @@ import {OverlayProvider} from '@gluestack-ui/overlay';
 import {ToastProvider} from '@gluestack-ui/toast';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {config} from '@gluestack-ui/config';
+import {Box} from '@gluestack-ui/themed';
 
 const GluestackUIStyledProvider = createProvider({StyledProvider});
 
-function GlueStackProvider({children, ...props}: any): JSX.Element {
+function GlueStackProvider({children, height, ...props}: any): JSX.Element {
   return (
     <GluestackUIStyledProvider config={config}>
       <OverlayProvider>
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          <Box height={height}>{children}</Box>
+        </ToastProvider>
       </OverlayProvider>
     </GluestackUIStyledProvider>
   );

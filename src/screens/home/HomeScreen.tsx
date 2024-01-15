@@ -22,10 +22,13 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {getDate, getDay, getMonth, getWeekDay, getYear} from 'bangla-calendar';
 import {useNavigation} from '@react-navigation/native';
 import {useQuery} from '../../realm/realm';
+import {IBalance, ILoner, ITotals} from '../../types/interface';
+import {ToastAndroid} from 'react-native';
 
 const HomeScreen = ({navigation}: any) => {
-  const allLoaner = useQuery('Loaner');
-  const allBalance = useQuery('Balance');
+  const allLoaner = useQuery<ILoner>('Loaner');
+  const allBalance = useQuery<IBalance>('Balance');
+  const totals = useQuery<ITotals>('Totals').find(item => item);
   let today = new Date();
   const banglaDate = getDate(today);
 
@@ -68,7 +71,7 @@ const HomeScreen = ({navigation}: any) => {
             gap="$1"
             alignItems="center">
             <Text color="$white">{banglaDate}</Text>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <HStack
                 px={'$1'}
                 justifyContent="flex-end"
@@ -78,9 +81,9 @@ const HomeScreen = ({navigation}: any) => {
                 <Text color="$white" fontWeight="semibold">
                   সেটিং
                 </Text>
-                {/* setting end*/}
               </HStack>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            {/* setting end*/}
           </HStack>
           <Center mx={'2%'}>
             <HStack gap="$7">
@@ -88,11 +91,15 @@ const HomeScreen = ({navigation}: any) => {
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">লাভ : {totalProfit}</Text>
+              <Text color="$white">
+                লাভ : {totals?.totalProfit ? totals?.totalProfit : 0}{' '}
+              </Text>
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">ক্ষতি : 50 </Text>
+              <Text color="$white">
+                ক্ষতি : {totals?.totalLoss ? totals?.totalLoss : 0}{' '}
+              </Text>
             </HStack>
           </Center>
 
@@ -102,7 +109,7 @@ const HomeScreen = ({navigation}: any) => {
                 ব্যালেন্স :{' '}
               </Text>
               <Heading size="4xl" color="$white">
-                {totalBalance - totalLoanAmount}
+                {totals?.totalBalance ? totals?.totalBalance : 0}
               </Heading>
             </HStack>
             {/* debt start*/}
@@ -148,7 +155,18 @@ const HomeScreen = ({navigation}: any) => {
         </Box>
 
         <HStack mt="$12" mx="4%" justifyContent="space-between">
-          <TouchableOpacity onPress={() => navigation.navigate('User')}>
+          <TouchableOpacity
+            onPress={() => {
+              if (!totals) {
+                ToastAndroid.showWithGravity(
+                  `ব্যালেন্স সংযোগ করুন`,
+                  ToastAndroid.LONG,
+                  ToastAndroid.CENTER,
+                );
+                return;
+              }
+              navigation.navigate('User');
+            }}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -182,7 +200,7 @@ const HomeScreen = ({navigation}: any) => {
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Profit')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -199,7 +217,7 @@ const HomeScreen = ({navigation}: any) => {
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Loss')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -218,7 +236,7 @@ const HomeScreen = ({navigation}: any) => {
           </TouchableOpacity>
         </HStack>
         <HStack mt="$8" mx="4%" justifyContent="space-between">
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Report')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -239,7 +257,8 @@ const HomeScreen = ({navigation}: any) => {
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ReportMonthly')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -256,7 +275,7 @@ const HomeScreen = ({navigation}: any) => {
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ReportWeekly')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -273,7 +292,7 @@ const HomeScreen = ({navigation}: any) => {
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Calculator')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
