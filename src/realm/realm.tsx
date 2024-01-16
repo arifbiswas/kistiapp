@@ -14,6 +14,7 @@ class Loaner extends Realm.Object<Loaner> {
   nid!: number;
   loanAmount!: number;
   profit!: number;
+  totalComes!: number;
   extraCharge!: number;
   referName!: string;
   referAddress!: string;
@@ -33,6 +34,7 @@ class Loaner extends Realm.Object<Loaner> {
       nid: 'int',
       loanAmount: 'int',
       profit: 'int',
+      totalInstallment: 'int',
       extraCharge: 'int',
       loanLead: 'int',
       referName: 'string',
@@ -147,19 +149,6 @@ class Totals extends Realm.Object<Totals> {
         default: () => 0,
       },
       totalLoan: {
-        type: 'int',
-        default: () => 0,
-      },
-
-      totalProfit: {
-        type: 'int',
-        default: () => 0,
-      },
-      totalLoss: {
-        type: 'int',
-        default: () => 0,
-      },
-      totalExtraCharge: {
         type: 'int',
         default: () => 0,
       },

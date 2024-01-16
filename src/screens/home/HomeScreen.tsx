@@ -29,9 +29,24 @@ const HomeScreen = ({navigation}: any) => {
   const realm = useRealm();
   const allLoaner = useQuery<ILoner>('Loaner');
   const allBalance = useQuery<IBalance>('Balance');
+  const lossLoaner = useQuery('Loaner', loaner => {
+    return loaner.filtered('isLoss == $0', true);
+  });
+  const haveLoaner = useQuery('Loaner', loaner => {
+    return loaner.filtered('isLoss == $0', false);
+  });
   const totals = useQuery<ITotals>('Totals').find(item => item);
   let today = new Date();
   const banglaDate = getDate(today);
+
+  const totalLossLoanAmount = lossLoaner.reduce(
+    (preValue, currentValue) => preValue + currentValue?.loanAmount,
+    0,
+  );
+  const totalExtraAmount = haveLoaner.reduce(
+    (preValue, currentValue) => preValue + currentValue?.extraCharge,
+    0,
+  );
 
   const totalBalance = allBalance.reduce(
     (preBalance, currentBalance) => preBalance + currentBalance?.balance,
@@ -40,14 +55,6 @@ const HomeScreen = ({navigation}: any) => {
 
   const totalProfit = allLoaner.reduce(
     (preValue, currentValue) => preValue + currentValue?.profit,
-    0,
-  );
-  const totalLoanAmount = allLoaner.reduce(
-    (preValue, currentValue) => preValue + currentValue?.loanAmount,
-    0,
-  );
-  const totalExtraAmount = allLoaner.reduce(
-    (preValue, currentValue) => preValue + currentValue?.extraCharge,
     0,
   );
 
@@ -93,14 +100,15 @@ const HomeScreen = ({navigation}: any) => {
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
               <Text color="$white">
-                লাভ : {totals?.totalProfit ? totals?.totalProfit : 0}{' '}
+                লাভ :{' '}
+                {totals?.totalComes && totals?.totalLoan
+                  ? totals?.totalComes - totals?.totalLoan
+                  : 0}
               </Text>
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">
-                ক্ষতি : {totals?.totalLoss ? totals?.totalLoss : 0}{' '}
-              </Text>
+              <Text color="$white">ক্ষতি : {totalLossLoanAmount}</Text>
             </HStack>
           </Center>
 
@@ -123,7 +131,7 @@ const HomeScreen = ({navigation}: any) => {
                 পাওনা :{' '}
               </Text>
               <Heading size="4xl" color="$white">
-                {totalLoanAmount}
+                {totals?.totalComes ? totals?.totalComes : 0}
               </Heading>
             </HStack>
           </VStack>
@@ -142,15 +150,31 @@ const HomeScreen = ({navigation}: any) => {
             </Box> */}
           <Center mt="$3">
             <HStack gap="$7">
-              <Text color="$white"> বই জমা : {totalExtraAmount}</Text>
+              <Text color="$white">
+                {' '}
+                মোট ঋণ : {totals?.totalLoan ? totals?.totalLoan : 0}
+              </Text>
               <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">মোট : {totalBalance}</Text>
-              {/* <Box h="$6">
+              {/* <Text color="$white">
+                মোট :{' '}
+                {totals?.totalBalance &&
+                (totals?.totalLoan || totalLossLoanAmount)
+                  ? totals?.totalBalance +
+                    totals?.totalLoan +
+                    totalLossLoanAmount
+                  : 0}
+              </Text> */}
+              <Box h="$6">
                 <Divider orientation="vertical" bgColor="$teal700" />
               </Box>
-              <Text color="$white">ক্ষতি : (-)৳ 50</Text> */}
+              <Text color="$white">
+                সর্ব মোট :{' '}
+                {totals?.totalBalance && totals?.totalComes && totalExtraAmount
+                  ? totals?.totalBalance + totals?.totalComes + totalExtraAmount
+                  : 0}
+              </Text>
             </HStack>
           </Center>
         </Box>

@@ -96,14 +96,6 @@ const UserDetailsScreen = ({route, navigation}: any) => {
 
           <HStack justifyContent="space-between" alignItems="center" w="100%">
             <Text size="sm" color="$coolGray600">
-              কিস্তি সংখা :
-            </Text>
-            <Text size="sm" color="$teal600" fontWeight="$black">
-              {item.loanLead}
-            </Text>
-          </HStack>
-          <HStack justifyContent="space-between" alignItems="center" w="100%">
-            <Text size="sm" color="$coolGray600">
               বই জমা :
             </Text>
             <Text size="sm" color="$teal600" fontWeight="$black">
@@ -119,18 +111,26 @@ const UserDetailsScreen = ({route, navigation}: any) => {
             </Text>
           </HStack>
           <HStack justifyContent="space-between" alignItems="center" w="100%">
+            <Text size="sm" color="$coolGray600">
+              মোট টাকা :
+            </Text>
+            <Text size="sm" color="$teal600" fontWeight="$black">
+              {item.loanAmount + item.extraCharge + item.profit}
+            </Text>
+          </HStack>
+          <HStack justifyContent="space-between" alignItems="center" w="100%">
             <Text
               size="sm"
               color={item.isLoss ? '$red600' : '$teal600'}
               fontWeight="$black">
               পরিশোধ করবে :{' '}
-              {item.isLoss ? 'পাওয়া যাবে না' : item.loanAmount + item.profit}
+              {item.isLoss ? 'পাওয়া যাবে না' : item.totalInstallment}
             </Text>
             <Text
               size="sm"
               color={item.isLoss ? '$red600' : '$teal600'}
               fontWeight="$black">
-              মোট টাকা : {item.loanAmount + item.extraCharge + item.profit}
+              কিস্তি সংখা : {item.loanLead}
             </Text>
           </HStack>
           <Divider bgColor="$teal600" />

@@ -46,7 +46,7 @@ const UserScreen = ({navigation}: any) => {
     extraCharge: 150,
     fatherName: 'ইউনুছ বিশ্বাস',
     loanAmount: 5000,
-    mobile: 0,
+    mobile: 1871063074,
     motherName: 'মোর্শেদা বেগম',
     name: 'আরিফ বিশ্বাস',
     nid: 46416414654,
@@ -60,6 +60,7 @@ const UserScreen = ({navigation}: any) => {
 
   const saveNewLoner = React.useCallback(
     async (loneData: ILoner) => {
+      loneData.totalInstallment = loneData.loanAmount + loneData.profit;
       // console.log(loneData);
       if (!totals) {
         ToastAndroid.showWithGravity(
@@ -86,9 +87,6 @@ const UserScreen = ({navigation}: any) => {
         realm.write(() => {
           totals.totalBalance = totals.totalBalance - loneData.loanAmount;
           totals.totalLoan = totals.totalLoan + loneData.loanAmount;
-          totals.totalProfit = totals.totalProfit + loneData.profit;
-          totals.totalExtraCharge =
-            totals.totalExtraCharge + loneData.extraCharge;
           totals.totalComes =
             totals.totalComes + (loneData.loanAmount + loneData.profit);
         });
@@ -113,15 +111,11 @@ const UserScreen = ({navigation}: any) => {
   );
   const deleteHandler = React.useCallback(async (loneData: ILoner) => {
     console.log(loneData);
-    setMenuModal(false);
-    setSelectItem(null);
+
     try {
       realm.write(() => {
         totals.totalBalance = totals.totalBalance + loneData.loanAmount;
         totals.totalLoan = totals.totalLoan - loneData.loanAmount;
-        totals.totalProfit = totals.totalProfit - loneData.profit;
-        totals.totalExtraCharge =
-          totals.totalExtraCharge - loneData.extraCharge;
         totals.totalComes =
           totals.totalComes - (loneData.loanAmount + loneData.profit);
       });
@@ -135,6 +129,8 @@ const UserScreen = ({navigation}: any) => {
         ToastAndroid.LONG,
         ToastAndroid.CENTER,
       );
+      setMenuModal(false);
+      setSelectItem(null);
     } catch (error) {
       console.log(error);
     }
@@ -147,9 +143,11 @@ const UserScreen = ({navigation}: any) => {
 
       try {
         realm.write(() => {
-          totals.totalLoss =
-            totals.totalLoss + (loneData.loanAmount + loneData.profit);
+          totals.totalLoan = totals.totalLoan - loneData.loanAmount;
+          totals.totalComes =
+            totals.totalComes - (loneData.loanAmount + loneData.profit);
         });
+
         realm.write(() => {
           single.isLoss = true;
         });
@@ -174,9 +172,11 @@ const UserScreen = ({navigation}: any) => {
 
       try {
         realm.write(() => {
-          totals.totalLoss =
-            totals.totalLoss - (loneData.loanAmount + loneData.profit);
+          totals.totalLoan = totals.totalLoan + loneData.loanAmount;
+          totals.totalComes =
+            totals.totalComes + (loneData.loanAmount + loneData.profit);
         });
+
         realm.write(() => {
           single.isLoss = false;
         });

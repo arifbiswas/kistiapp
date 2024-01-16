@@ -9,6 +9,7 @@ export interface ILoner {
   nid: number;
   loanAmount: number;
   profit: number;
+  totalInstallment: number;
   extraCharge: number;
   loanLead: number;
   referName: string;
@@ -42,12 +43,7 @@ export interface IInstallment {
 }
 export interface ITotals {
   _id?: Realm.BSON.ObjectId;
-  totalAmount?: number;
   totalBalance?: number;
   totalLoan?: number;
-  totalLoaner?: number;
-  totalProfit?: number;
-  totalLoss?: number;
-  totalExtraCharge?: number;
   totalComes?: number;
 }
