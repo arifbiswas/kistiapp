@@ -7,7 +7,7 @@ import {useQuery} from '../../realm/realm';
 
 const LossScreen = () => {
   const allLoaner = useQuery('Loaner', loaner => {
-    return loaner.filtered('loss == $0', true);
+    return loaner.filtered('isLoss == $0', true);
   });
   const totalLoanAmount = allLoaner.reduce(
     (preValue, currentValue) => preValue + currentValue?.loanAmount,
@@ -20,11 +20,14 @@ const LossScreen = () => {
   return (
     <GlueStackProvider height="100%">
       <HeaderPlusBack />
-      <Box py="$2" px="$2">
+      <HStack py="$2" px="$2" justifyContent="space-between">
+        <Text color="$teal600" size="md">
+          মোট সংখা : {allLoaner.length}
+        </Text>
         <Text color="$teal600" size="md">
           মোট ক্ষতি : {totalLoanAmount + totalProfit}
         </Text>
-      </Box>
+      </HStack>
       <Box mx="2%">
         {allLoaner.map((item, index) => (
           <Box
@@ -49,8 +52,8 @@ const LossScreen = () => {
                   </Text>
                 </VStack>
               </HStack>
-              <Text size="md" fontWeight="$bold" color="$teal600">
-                {item.loanAmount + item.profit}
+              <Text size="md" fontWeight="$bold" color="$red600">
+                - {item.loanAmount + item.profit}
               </Text>
             </HStack>
           </Box>

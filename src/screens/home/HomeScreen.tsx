@@ -21,11 +21,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {getDate, getDay, getMonth, getWeekDay, getYear} from 'bangla-calendar';
 import {useNavigation} from '@react-navigation/native';
-import {useQuery} from '../../realm/realm';
+import {useQuery, useRealm} from '../../realm/realm';
 import {IBalance, ILoner, ITotals} from '../../types/interface';
 import {ToastAndroid} from 'react-native';
 
 const HomeScreen = ({navigation}: any) => {
+  const realm = useRealm();
   const allLoaner = useQuery<ILoner>('Loaner');
   const allBalance = useQuery<IBalance>('Balance');
   const totals = useQuery<ITotals>('Totals').find(item => item);

@@ -121,14 +121,14 @@ const UserDetailsScreen = ({route, navigation}: any) => {
           <HStack justifyContent="space-between" alignItems="center" w="100%">
             <Text
               size="sm"
-              color={item.loss ? '$red600' : '$teal600'}
+              color={item.isLoss ? '$red600' : '$teal600'}
               fontWeight="$black">
               পরিশোধ করবে :{' '}
-              {item.loss ? 'পাওয়া যাবে না' : item.loanAmount + item.profit}
+              {item.isLoss ? 'পাওয়া যাবে না' : item.loanAmount + item.profit}
             </Text>
             <Text
               size="sm"
-              color={item.loss ? '$red600' : '$teal600'}
+              color={item.isLoss ? '$red600' : '$teal600'}
               fontWeight="$black">
               মোট টাকা : {item.loanAmount + item.extraCharge + item.profit}
             </Text>

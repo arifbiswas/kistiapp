@@ -1,5 +1,5 @@
 import React from 'react';
-import {TouchableOpacity, ToastAndroid} from 'react-native';
+import {TouchableOpacity, ToastAndroid, Linking} from 'react-native';
 
 import {
   Avatar,
@@ -34,33 +34,28 @@ import {GColors} from '../../Styles/GColors';
 const UserScreen = ({navigation}: any) => {
   const [modal, setModal] = React.useState(false);
   const [menuModal, setMenuModal] = React.useState(false);
-  const [selectItem, setSelectItem] = React.useState<ILoner>({});
+  const [selectItem, setSelectItem] = React.useState<ILoner>(null);
   const realm = useRealm();
-  const AllLoaner = useQuery<ILoner>('Loaner');
+  const allLoaner = useQuery<ILoner>('Loaner');
 
   const totals = useQuery<ITotals>('Totals').find(item => item);
-  console.log(totals);
+  console.log(allLoaner);
 
   const [data, setData] = React.useState({
     address: '১২৬/১ মিরহাজীরবাগ',
     extraCharge: 150,
     fatherName: 'ইউনুছ বিশ্বাস',
     loanAmount: 5000,
-    mobile: 1871063074,
+    mobile: 0,
     motherName: 'মোর্শেদা বেগম',
     name: 'আরিফ বিশ্বাস',
     nid: 46416414654,
     profit: 1500,
     loanLead: 12,
-    loss: false,
-    day: Number(new Date().toLocaleDateString().split('/')[0]),
-    month: Number(new Date().toLocaleDateString().split('/')[1]),
-    year: Number(new Date().toLocaleDateString().split('/')[2]),
+    isLoss: false,
     referAddress: '১৫০ মিরহাজীবাগ',
     referMobile: 1871063074,
     referName: 'আলি ভাই',
-    createdAt: new Date(),
-    updatedAt: new Date(),
   });
 
   const saveNewLoner = React.useCallback(
@@ -92,12 +87,14 @@ const UserScreen = ({navigation}: any) => {
           totals.totalBalance = totals.totalBalance - loneData.loanAmount;
           totals.totalLoan = totals.totalLoan + loneData.loanAmount;
           totals.totalProfit = totals.totalProfit + loneData.profit;
-          // totals.totalLoss = totals.totalProfit + loneData.;
+          totals.totalExtraCharge =
+            totals.totalExtraCharge + loneData.extraCharge;
+          totals.totalComes =
+            totals.totalComes + (loneData.loanAmount + loneData.profit);
         });
 
         realm.write(() => {
           realm.create('Loaner', {
-            _id: new Realm.BSON.ObjectId(),
             ...loneData,
           });
         });
@@ -114,27 +111,34 @@ const UserScreen = ({navigation}: any) => {
     },
     [data],
   );
-  const deleteHandler = React.useCallback(
-    async (loneData: ILoner) => {
-      // console.log(loneData);
+  const deleteHandler = React.useCallback(async (loneData: ILoner) => {
+    console.log(loneData);
+    setMenuModal(false);
+    setSelectItem(null);
+    try {
+      realm.write(() => {
+        totals.totalBalance = totals.totalBalance + loneData.loanAmount;
+        totals.totalLoan = totals.totalLoan - loneData.loanAmount;
+        totals.totalProfit = totals.totalProfit - loneData.profit;
+        totals.totalExtraCharge =
+          totals.totalExtraCharge - loneData.extraCharge;
+        totals.totalComes =
+          totals.totalComes - (loneData.loanAmount + loneData.profit);
+      });
 
-      try {
-        realm.write(() => {
-          realm.delete(loneData);
-        });
+      realm.write(() => {
+        realm.delete(loneData);
+      });
 
-        ToastAndroid.showWithGravity(
-          `ডিলেট সফল হইছে`,
-          ToastAndroid.LONG,
-          ToastAndroid.CENTER,
-        );
-        setMenuModal(false);
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    [selectItem],
-  );
+      ToastAndroid.showWithGravity(
+        `ডিলেট সফল হইছে`,
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
   const lossHandler = React.useCallback(
     async (loneData: ILoner) => {
       // console.log(loneData);
@@ -147,7 +151,7 @@ const UserScreen = ({navigation}: any) => {
             totals.totalLoss + (loneData.loanAmount + loneData.profit);
         });
         realm.write(() => {
-          single.loss = true;
+          single.isLoss = true;
         });
 
         ToastAndroid.showWithGravity(
@@ -174,7 +178,7 @@ const UserScreen = ({navigation}: any) => {
             totals.totalLoss - (loneData.loanAmount + loneData.profit);
         });
         realm.write(() => {
-          single.loss = false;
+          single.isLoss = false;
         });
 
         ToastAndroid.showWithGravity(
@@ -198,21 +202,21 @@ const UserScreen = ({navigation}: any) => {
         <HeaderPlusBack />
         <Box my="$2" px="$3">
           <Text color="$teal600" size="sm">
-            মোট সদস্য : {AllLoaner.length}
+            মোট সদস্য : {allLoaner.length}
           </Text>
         </Box>
         <ScrollView>
           <Box pb="$16">
-            {AllLoaner.length !== 0 ? (
-              <>
-                {AllLoaner.map(item => (
+            {allLoaner.length !== 0 ? (
+              <Box>
+                {allLoaner.map((item, index) => (
                   <TouchableOpacity
-                    key={item?._id}
+                    key={index}
                     onPress={() => navigation.navigate('UserDetails', item)}>
                     <HStack
                       my="$1"
                       mx="2%"
-                      borderColor={item.loss ? '$red600' : '$teal600'}
+                      borderColor={item.isLoss ? '$red600' : '$teal600'}
                       borderWidth="$1"
                       p="$1"
                       rounded="$md"
@@ -220,7 +224,7 @@ const UserScreen = ({navigation}: any) => {
                       justifyContent="space-between">
                       <HStack gap="$3" alignItems="center" my="$1">
                         <Avatar
-                          bgColor={item.loss ? '$red600' : '$teal600'}
+                          bgColor={item.isLoss ? '$red600' : '$teal600'}
                           style={{
                             width: 55,
                             height: 55,
@@ -228,17 +232,11 @@ const UserScreen = ({navigation}: any) => {
                           <AvatarFallbackText>
                             {item?.name.slice(0, 1)}
                           </AvatarFallbackText>
-                          {/* <AvatarImage
-                    source={{
-                      uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=80&q=60',
-                    }}
-                    alt="name"
-                  /> */}
                         </Avatar>
                         <VStack gap="-$1">
                           <Text
                             size="sm"
-                            color={item.loss ? '$red600' : '$teal600'}
+                            color={item.isLoss ? '$red600' : '$teal600'}
                             fontWeight="bold">
                             {item?.name}
                           </Text>
@@ -250,7 +248,7 @@ const UserScreen = ({navigation}: any) => {
                           </Text>
                         </VStack>
                       </HStack>
-                      {item.loss && (
+                      {item.isLoss && (
                         <Text size="sm" fontWeight="$black" color="$red500">
                           ক্ষতি
                         </Text>
@@ -267,13 +265,13 @@ const UserScreen = ({navigation}: any) => {
                         <Entypo
                           name="dots-three-vertical"
                           size={20}
-                          color={item.loss ? GColors.red : GColors.primary}
+                          color={item.isLoss ? GColors.red : GColors.primary}
                         />
                       </TouchableOpacity>
                     </HStack>
                   </TouchableOpacity>
                 ))}
-              </>
+              </Box>
             ) : (
               <Box my="$4">
                 <Text
@@ -325,72 +323,10 @@ const UserScreen = ({navigation}: any) => {
         >
           <>
             <Box gap="$1">
-              <TouchableOpacity>
-                <View
-                  bgColor="$teal600"
-                  p="$3"
-                  w="100%"
-                  h="$12"
-                  rounded="$md"
-                  justifyContent="center"
-                  alignItems="center">
-                  <Text size="md" color="$white" fontWeight="bold">
-                    কল
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <View
-                  bgColor="$teal600"
-                  p="$3"
-                  w="100%"
-                  h="$12"
-                  rounded="$md"
-                  justifyContent="center"
-                  alignItems="center">
-                  <Text size="md" color="$white" fontWeight="bold">
-                    এডিট
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                <View
-                  bgColor="$teal600"
-                  p="$3"
-                  w="100%"
-                  h="$12"
-                  rounded="$md"
-                  justifyContent="center"
-                  alignItems="center">
-                  <Text size="md" color="$white" fontWeight="bold">
-                    সাপ্তাহিক জমা
-                  </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  deleteHandler(selectItem);
-                  setMenuModal(false);
-                }}>
-                <View
-                  bgColor="$red600"
-                  p="$3"
-                  w="100%"
-                  h="$12"
-                  rounded="$md"
-                  justifyContent="center"
-                  alignItems="center">
-                  <Text size="md" color="$white" fontWeight="bold">
-                    ডিলেট
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              {selectItem.loss ? (
+              {allLoaner.length !== 0 && selectItem && selectItem?.isLoss ? (
                 <TouchableOpacity
                   onPress={() => {
                     haveToHandler(selectItem);
-                    // setMenuModal(false);
                   }}>
                   <View
                     bgColor="$green600"
@@ -406,25 +342,100 @@ const UserScreen = ({navigation}: any) => {
                   </View>
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    lossHandler(selectItem);
-                    // setMenuModal(false);
-                  }}>
-                  <View
-                    bgColor="$red600"
-                    p="$3"
-                    w="100%"
-                    h="$12"
-                    rounded="$md"
-                    justifyContent="center"
-                    alignItems="center">
-                    <Text size="md" color="$white" fontWeight="bold">
-                      পাওয়া যাবে না (ক্ষতি)
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Linking.openURL(`tel:0${selectItem.mobile}`);
+                      setMenuModal(false);
+                    }}>
+                    <View
+                      bgColor="$teal600"
+                      p="$3"
+                      w="100%"
+                      h="$12"
+                      rounded="$md"
+                      justifyContent="center"
+                      alignItems="center">
+                      <Text size="md" color="$white" fontWeight="bold">
+                        কল
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('UpdateUser', {item: selectItem});
+                      setMenuModal(false);
+                    }}>
+                    <View
+                      bgColor="$teal600"
+                      p="$3"
+                      w="100%"
+                      h="$12"
+                      rounded="$md"
+                      justifyContent="center"
+                      alignItems="center">
+                      <Text size="md" color="$white" fontWeight="bold">
+                        এডিট
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('WeeklyInstallment', {
+                        item: selectItem,
+                      });
+                      setMenuModal(false);
+                    }}>
+                    <View
+                      bgColor="$teal600"
+                      p="$3"
+                      w="100%"
+                      h="$12"
+                      rounded="$md"
+                      justifyContent="center"
+                      alignItems="center">
+                      <Text size="md" color="$white" fontWeight="bold">
+                        সাপ্তাহিক জমা
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      lossHandler(selectItem);
+                    }}>
+                    <View
+                      bgColor="$red600"
+                      p="$3"
+                      w="100%"
+                      h="$12"
+                      rounded="$md"
+                      justifyContent="center"
+                      alignItems="center">
+                      <Text size="md" color="$white" fontWeight="bold">
+                        পাওয়া যাবে না (ক্ষতি)
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                </>
               )}
+              <TouchableOpacity
+                onPress={() => {
+                  deleteHandler(selectItem);
+                }}>
+                <View
+                  bgColor="$red600"
+                  p="$3"
+                  w="100%"
+                  h="$12"
+                  rounded="$md"
+                  justifyContent="center"
+                  alignItems="center">
+                  <Text size="md" color="$white" fontWeight="bold">
+                    ডিলেট
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </Box>
           </>
         </CustomModal>
@@ -462,8 +473,8 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="নাম"
                     keyboardType="default"
+                    textContentType="name"
                     size="sm"
-                    textContentType="none"
                     onChangeText={text => setData({...data, name: text})}
                     value={data.name}
                   />
@@ -471,6 +482,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="পিতার নাম"
+                    textContentType="name"
                     size="sm"
                     onChangeText={text => setData({...data, fatherName: text})}
                     value={data.fatherName}
@@ -479,6 +491,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="মাতার নাম"
+                    textContentType="name"
                     size="sm"
                     onChangeText={text => setData({...data, motherName: text})}
                     value={data.motherName}
@@ -487,6 +500,7 @@ const UserScreen = ({navigation}: any) => {
                 <Input size="lg">
                   <InputField
                     placeholder="ঠিকানা"
+                    textContentType="fullStreetAddress"
                     size="sm"
                     onChangeText={text => setData({...data, address: text})}
                     value={data.address}
@@ -496,7 +510,8 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="মোবাইল"
                     size="sm"
-                    keyboardType="numeric"
+                    keyboardType="number-pad"
+                    textContentType="telephoneNumber"
                     onChangeText={text =>
                       setData({...data, mobile: Number(text)})
                     }
@@ -508,6 +523,7 @@ const UserScreen = ({navigation}: any) => {
                     placeholder="এন আইডি"
                     size="sm"
                     keyboardType="numeric"
+                    textContentType="sublocality"
                     onChangeText={text => setData({...data, nid: Number(text)})}
                     value={`${data.nid}`}
                   />
@@ -517,6 +533,7 @@ const UserScreen = ({navigation}: any) => {
                     placeholder="ঋনের পরিমান"
                     size="sm"
                     keyboardType="numeric"
+                    textContentType="none"
                     onChangeText={text =>
                       setData({...data, loanAmount: Number(text)})
                     }
@@ -527,6 +544,7 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="লাভ"
                     size="sm"
+                    textContentType="none"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, profit: Number(text)})
@@ -538,6 +556,7 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="বই জমা"
                     size="sm"
+                    textContentType="none"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, extraCharge: Number(text)})
@@ -569,6 +588,7 @@ const UserScreen = ({navigation}: any) => {
                     placeholder="নাম"
                     size="sm"
                     keyboardType="numeric"
+                    textContentType="name"
                     onChangeText={text => setData({...data, referName: text})}
                     value={`${data.referName}`}
                   />
@@ -577,6 +597,7 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="ঠিকানা"
                     size="sm"
+                    textContentType="fullStreetAddress"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, referAddress: text})
@@ -588,6 +609,7 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="মোবাইল"
                     size="sm"
+                    textContentType="telephoneNumber"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, referMobile: Number(text)})

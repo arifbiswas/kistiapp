@@ -19,14 +19,10 @@ class Loaner extends Realm.Object<Loaner> {
   referAddress!: string;
   referMobile!: number;
 
-  day!: number;
-  month!: number;
-  year!: number;
-  createdAt!: Date;
-  updatedAt!: Date;
-
   static schema: ObjectSchema = {
     name: 'Loaner',
+    embedded: false,
+    asymmetric: false,
     properties: {
       _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
       name: 'string',
@@ -42,34 +38,19 @@ class Loaner extends Realm.Object<Loaner> {
       referName: 'string',
       referAddress: 'string',
       referMobile: 'int',
-      loss: 'bool',
-      day: 'int',
-      month: 'int',
-      year: 'int',
-      createdAt: 'date',
-      updatedAt: 'date',
-    },
-    primaryKey: '_id',
-  };
-}
-// Blance Modal
-class Balance extends Realm.Object<Balance> {
-  _id!: Realm.BSON.ObjectId;
-  balance!: number;
-  day!: number;
-  month!: number;
-  year!: number;
-  createdAt!: Date;
-  updatedAt!: Date;
-
-  static schema: ObjectSchema = {
-    name: 'Balance',
-    properties: {
-      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
-      balance: 'int',
-      day: 'int',
-      month: 'int',
-      year: 'int',
+      isLoss: 'mixed',
+      day: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
+      },
+      month: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
+      },
+      year: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[2]),
+      },
       createdAt: {
         type: 'date',
         default: () => new Date(),
@@ -83,6 +64,77 @@ class Balance extends Realm.Object<Balance> {
   };
 }
 // Blance Modal
+class Balance extends Realm.Object<Balance> {
+  _id!: Realm.BSON.ObjectId;
+  balance!: number;
+
+  static schema: ObjectSchema = {
+    name: 'Balance',
+    properties: {
+      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      balance: 'int',
+      day: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
+      },
+      month: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
+      },
+      year: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[2]),
+      },
+      createdAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+      updatedAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+    },
+    primaryKey: '_id',
+  };
+}
+
+// Weekly Installments Modal
+class Installments extends Realm.Object<Installments> {
+  _id!: Realm.BSON.ObjectId;
+  amount!: number;
+  userId!: Realm.BSON.ObjectId;
+
+  static schema: ObjectSchema = {
+    name: 'Installments',
+    properties: {
+      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      userId: 'objectId',
+      amount: 'int',
+      day: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
+      },
+      month: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
+      },
+      year: {
+        type: 'int',
+        default: () => Number(new Date().toLocaleDateString().split('/')[2]),
+      },
+      createdAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+      updatedAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+    },
+    primaryKey: '_id',
+  };
+}
+// Totals Modal
 class Totals extends Realm.Object<Totals> {
   _id!: Realm.BSON.ObjectId;
 
@@ -90,10 +142,6 @@ class Totals extends Realm.Object<Totals> {
     name: 'Totals',
     properties: {
       _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
-      totalAmount: {
-        type: 'int',
-        default: () => 0,
-      },
       totalBalance: {
         type: 'int',
         default: () => 0,
@@ -102,10 +150,7 @@ class Totals extends Realm.Object<Totals> {
         type: 'int',
         default: () => 0,
       },
-      totalLoaner: {
-        type: 'int',
-        default: () => 0,
-      },
+
       totalProfit: {
         type: 'int',
         default: () => 0,
@@ -129,7 +174,7 @@ class Totals extends Realm.Object<Totals> {
 
 // Create a configuration object
 const realmConfig: Realm.Configuration = {
-  schema: [Loaner, Balance, Totals],
+  schema: [Loaner, Balance, Installments, Totals],
 };
 
 // Create a realm context

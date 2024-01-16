@@ -3,7 +3,7 @@ import React from 'react';
 import {Box, HStack, Text} from '@gluestack-ui/themed';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-const HeaderPlusBack = () => {
+const HeaderPlusBack = ({children}: any) => {
   const navigation = useNavigation();
   return (
     <Box
@@ -13,14 +13,17 @@ const HeaderPlusBack = () => {
       px="3%"
       //   alignItems="center"
       justifyContent="center">
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <HStack alignItems="center" gap="$1">
-          <AntDesign name="arrowleft" size={25} color="white" />
-          <Text color="$white" fontWeight="bold">
-            পিছনে
-          </Text>
-        </HStack>
-      </TouchableOpacity>
+      <HStack justifyContent="space-between" alignItems="center">
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <HStack alignItems="center" gap="$1">
+            <AntDesign name="arrowleft" size={25} color="white" />
+            <Text color="$white" fontWeight="bold">
+              পিছনে
+            </Text>
+          </HStack>
+        </TouchableOpacity>
+        {children}
+      </HStack>
     </Box>
   );
 };

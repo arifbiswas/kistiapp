@@ -43,12 +43,7 @@ const BalanceScreen = ({navigation}: any) => {
   console.log(totals);
 
   const [data, setData] = React.useState({
-    balance: 500,
-    day: Number(new Date().toLocaleDateString().split('/')[0]),
-    month: Number(new Date().toLocaleDateString().split('/')[1]),
-    year: Number(new Date().toLocaleDateString().split('/')[2]),
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    balance: 50000,
   });
   const saveNewLoner = React.useCallback(
     async (balance: IBalance) => {
@@ -58,11 +53,7 @@ const BalanceScreen = ({navigation}: any) => {
         if (!totals?.totalBalance) {
           realm.write(() => {
             realm.create('Totals', {
-              _id: new Realm.BSON.ObjectId(),
               totalBalance: balance.balance,
-              totalLoan: 0,
-              totalProfit: 0,
-              totalLoss: 0,
             });
           });
         }
@@ -75,7 +66,6 @@ const BalanceScreen = ({navigation}: any) => {
 
         realm.write(() => {
           realm.create('Balance', {
-            _id: new Realm.BSON.ObjectId(),
             ...balance,
           });
         });
@@ -158,7 +148,7 @@ const BalanceScreen = ({navigation}: any) => {
                       justifyContent="space-between">
                       <HStack gap="$3" alignItems="center" my="$1">
                         <VStack gap="-$1">
-                          <HStack py="$1" alignItems="center">
+                          <HStack py="$1" alignItems="center" gap="$1">
                             <Text
                               size="md"
                               color="$coolGray500"
@@ -166,7 +156,7 @@ const BalanceScreen = ({navigation}: any) => {
                               ব্যালেন্স : {''}
                             </Text>
                             <Text size="md" color="$teal600" fontWeight="bold">
-                              {item?.balance}
+                              + {item?.balance}
                             </Text>
                           </HStack>
                           <Text size="sm" color="$coolGray400">
