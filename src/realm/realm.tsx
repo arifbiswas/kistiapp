@@ -43,11 +43,11 @@ class Loaner extends Realm.Object<Loaner> {
       isLoss: 'mixed',
       day: {
         type: 'int',
-        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
+        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
       },
       month: {
         type: 'int',
-        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
+        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
       },
       year: {
         type: 'int',
@@ -77,11 +77,11 @@ class Balance extends Realm.Object<Balance> {
       balance: 'int',
       day: {
         type: 'int',
-        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
+        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
       },
       month: {
         type: 'int',
-        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
+        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
       },
       year: {
         type: 'int',
@@ -114,11 +114,11 @@ class Installments extends Realm.Object<Installments> {
       amount: 'int',
       day: {
         type: 'int',
-        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
+        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
       },
       month: {
         type: 'int',
-        default: () => Number(new Date().toLocaleDateString().split('/')[1]),
+        default: () => Number(new Date().toLocaleDateString().split('/')[0]),
       },
       year: {
         type: 'int',

@@ -6,12 +6,12 @@ type CustomModalProps = {
   modalVisible: boolean;
   setModalVisible?: Function | any;
   children: JSX.Element;
-  height?: string;
+  height?: string | number;
   paddingHorizontal?: string;
   slide?: 'slide' | 'fade';
   onlyTopRadius?: number;
   Radius?: number;
-  width?: string;
+  width?: string | number;
   center?: string;
   appearance?: boolean;
   backButton?: boolean;

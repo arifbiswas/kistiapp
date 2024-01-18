@@ -40,6 +40,7 @@ const UserScreen = ({navigation}: any) => {
 
   const totals = useQuery<ITotals>('Totals').find(item => item);
   console.log(allLoaner);
+  console.log(totals);
 
   const [data, setData] = React.useState({
     address: '১২৬/১ মিরহাজীরবাগ',

@@ -277,7 +277,7 @@ const BalanceScreen = ({navigation}: any) => {
           modalVisible={modal}
           setModalVisible={setModal}
           backButton={true}
-          height="40%"
+          height={180}
           appearance={true}>
           <>
             {/* <Box>
