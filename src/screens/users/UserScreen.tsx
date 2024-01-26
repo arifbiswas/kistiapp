@@ -39,8 +39,8 @@ const UserScreen = ({navigation}: any) => {
   const allLoaner = useQuery<ILoner>('Loaner');
 
   const totals = useQuery<ITotals>('Totals').find(item => item);
-  console.log(allLoaner);
-  console.log(totals);
+  // console.log(allLoaner);
+  // console.log(totals);
 
   const [data, setData] = React.useState({
     address: '১২৬/১ মিরহাজীরবাগ',
@@ -249,9 +249,13 @@ const UserScreen = ({navigation}: any) => {
                           </Text>
                         </VStack>
                       </HStack>
-                      {item.isLoss && (
+                      {item.isLoss ? (
                         <Text size="sm" fontWeight="$black" color="$red500">
                           ক্ষতি
+                        </Text>
+                      ) : (
+                        <Text size="xs" fontWeight="$black" color="$teal600">
+                          {item.day}/{item.month}/{item.year}
                         </Text>
                       )}
 

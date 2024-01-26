@@ -11,19 +11,21 @@ const ReportScreen = () => {
   const realm = useRealm();
   const allLoaner = useQuery<ILoner>('Loaner');
   const allBalance = useQuery<IBalance>('Balance');
-  const lossLoaner = useQuery('Loaner', loaner => {
+  const lossLoaner = useQuery<ILoner>('Loaner', loaner => {
     return loaner.filtered('isLoss == $0', true);
   });
-
+  const fullInstallments = useQuery<IInstallment>('Installments');
   // const haveLoaner = useQuery('Loaner', loaner => {
   //   return loaner.filtered('isLoss == $0', false);
   // });
   const totals = useQuery<ITotals>('Totals').find(item => item);
 
-  let today = new Date();
-
   const totalLossLoanAmount = lossLoaner.reduce(
     (preValue, currentValue) => preValue + currentValue?.loanAmount,
+    0,
+  );
+  const totalInstallment = fullInstallments.reduce(
+    (preValue, currentValue) => preValue + currentValue?.amount,
     0,
   );
 
@@ -34,17 +36,23 @@ const ReportScreen = () => {
     );
   });
   const monthlyTotalBalance = monthlyBalance.reduce(
-    (preValue, currentValue) => preValue + currentValue?.loanAmount,
+    (preValue, currentValue) => preValue + currentValue?.balance,
     0,
   );
 
-  const monthlyLoaner = useQuery('Loaner', loaner => {
+  const monthlyLoaner = useQuery<ILoner>('Loaner', loaner => {
     return loaner.filtered(
       'month == $0',
       Number(new Date().toLocaleDateString().split('/')[0]),
     );
   });
-  const monthlyLossLoaner = useQuery('Loaner', loaner => {
+
+  const monthlyTotalComes = monthlyLoaner.reduce(
+    (preValue, currentValue) => preValue + currentValue?.totalInstallment,
+    0,
+  );
+
+  const monthlyLossLoaner = useQuery<ILoner>('Loaner', loaner => {
     return loaner
       .filtered('isLoss == $0', true)
       .filtered(
@@ -56,6 +64,7 @@ const ReportScreen = () => {
     (preValue, currentValue) => preValue + currentValue?.loanAmount,
     0,
   );
+  console.log(monthlyTotalBalance);
   const monthlyTotalLoanAmount = monthlyLoaner.reduce(
     (preValue, currentValue) => preValue + currentValue?.loanAmount,
     0,
@@ -66,11 +75,12 @@ const ReportScreen = () => {
       Number(new Date().toLocaleDateString().split('/')[0]),
     );
   });
-  const monthlyTotalComes = installments.reduce(
+  const monthlyAllReadyTotalComes = installments.reduce(
     (preValue, currentValue) => preValue + currentValue?.amount,
     0,
   );
-  console.log(installments);
+
+  // console.log(monthlyAllReadyTotalComes);
   return (
     <GlueStackProvider height="100%">
       <HeaderPlusBack />
@@ -132,10 +142,11 @@ const ReportScreen = () => {
               {totals?.totalLoan} ৳
             </Text>
           </HStack>
+
           <HStack mx="4%" justifyContent="space-between">
-            <Text fontWeight="$semibold">মোট লাভ</Text>
+            <Text fontWeight="$semibold">মোট জমা</Text>
             <Text fontWeight="$black" color="$teal600">
-              {totals?.totalComes - totals?.totalLoan} ৳
+              {totalInstallment} ৳
             </Text>
           </HStack>
           <HStack mx="4%" justifyContent="space-between">
@@ -151,7 +162,17 @@ const ReportScreen = () => {
         <HStack mx="4%" justifyContent="space-between">
           <Text fontWeight="$semibold">মোট </Text>
           <Text fontWeight="$black" color="$teal600">
-            {totalLossLoanAmount + totals?.totalComes + totals?.totalBalance} ৳
+            {totalLossLoanAmount +
+              totals?.totalComes +
+              totals?.totalBalance -
+              (totals?.totalComes - totals?.totalLoan)}
+            ৳
+          </Text>
+        </HStack>
+        <HStack mx="4%" justifyContent="space-between">
+          <Text fontWeight="$semibold">মোট লাভ</Text>
+          <Text fontWeight="$black" color="$teal600">
+            {totals?.totalComes - totals?.totalLoan} ৳
           </Text>
         </HStack>
 
@@ -164,19 +185,28 @@ const ReportScreen = () => {
           <HStack mx="4%" justifyContent="space-between">
             <Text fontWeight="$semibold">মোট ব্যালেন্স</Text>
             <Text fontWeight="$black" color="$teal600">
-              {monthlyTotalBalance} ৳
+              {monthlyTotalBalance -
+                monthlyTotalLoanAmount +
+                monthlyAllReadyTotalComes}
+              ৳
             </Text>
           </HStack>
           <HStack mx="4%" justifyContent="space-between">
             <Text fontWeight="$semibold">মোট লোন</Text>
             <Text fontWeight="$black" color="$teal600">
-              {totals?.totalLoan} ৳
+              {monthlyTotalLoanAmount - monthlyAllReadyTotalComes} ৳
             </Text>
           </HStack>
-          <HStack mx="4%" justifyContent="space-between">
+          {/* <HStack mx="4%" justifyContent="space-between">
             <Text fontWeight="$semibold">মোট লাভ</Text>
             <Text fontWeight="$black" color="$teal600">
-              {totals?.totalComes - totals?.totalLoan} ৳
+              {monthlyTotalComes - monthlyTotalLoanAmount} ৳
+            </Text>
+          </HStack> */}
+          <HStack mx="4%" justifyContent="space-between">
+            <Text fontWeight="$semibold">মোট মাসিক জমা</Text>
+            <Text fontWeight="$black" color="$teal600">
+              {monthlyAllReadyTotalComes} ৳
             </Text>
           </HStack>
           <HStack mx="4%" justifyContent="space-between">
@@ -193,8 +223,8 @@ const ReportScreen = () => {
           <Text fontWeight="$semibold">মোট </Text>
           <Text fontWeight="$black" color="$teal600">
             {monthlyTotalLossLoanAmount +
-              totals?.totalComes +
-              totals?.totalBalance}{' '}
+              totals.totalComes +
+              totals.totalBalance}
             ৳
           </Text>
         </HStack>

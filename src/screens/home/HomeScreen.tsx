@@ -260,7 +260,11 @@ const HomeScreen = ({navigation}: any) => {
             </VStack>
           </TouchableOpacity>
         </HStack>
-        <HStack mt="$8" mx="4%" justifyContent="space-between">
+        <HStack
+          mt="$8"
+          mx="4%"
+          //  justifyContent="space-between"
+          gap="$5">
           <TouchableOpacity onPress={() => navigation.navigate('Report')}>
             <VStack alignItems="center">
               <Box
@@ -296,7 +300,7 @@ const HomeScreen = ({navigation}: any) => {
                 <MaterialIcons name="find-in-page" size={45} color="white" />
               </Box>
               <Text color="$teal600" fontWeight="$semibold">
-                মাসিক
+                মাসিক জমা
               </Text>
             </VStack>
           </TouchableOpacity>
@@ -313,11 +317,11 @@ const HomeScreen = ({navigation}: any) => {
                 <MaterialIcons name="find-in-page" size={45} color="white" />
               </Box>
               <Text color="$teal600" fontWeight="$semibold">
-                সাপ্তাহিক
+                প্রতিদিন জমা
               </Text>
             </VStack>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Calculator')}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Calculator')}>
             <VStack alignItems="center">
               <Box
                 h="$16"
@@ -333,7 +337,7 @@ const HomeScreen = ({navigation}: any) => {
                 ক্যাল
               </Text>
             </VStack>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </HStack>
       </Box>
     </GlueStackProvider>
