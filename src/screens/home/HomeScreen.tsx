@@ -192,7 +192,7 @@ const HomeScreen = ({navigation}: any) => {
               }
               navigation.navigate('User');
             }}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -209,7 +209,7 @@ const HomeScreen = ({navigation}: any) => {
             </VStack>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Balance')}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -226,7 +226,7 @@ const HomeScreen = ({navigation}: any) => {
             </VStack>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Profit')}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -243,7 +243,7 @@ const HomeScreen = ({navigation}: any) => {
             </VStack>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('Loss')}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -263,10 +263,11 @@ const HomeScreen = ({navigation}: any) => {
         <HStack
           mt="$8"
           mx="4%"
-          //  justifyContent="space-between"
-          gap="$5">
+          justifyContent="space-between"
+          // gap="$5"
+        >
           <TouchableOpacity onPress={() => navigation.navigate('Report')}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -288,7 +289,7 @@ const HomeScreen = ({navigation}: any) => {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('ReportMonthly')}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -305,7 +306,7 @@ const HomeScreen = ({navigation}: any) => {
             </VStack>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('ReportWeekly')}>
-            <VStack alignItems="center">
+            <VStack alignItems="center" gap="$1">
               <Box
                 h="$16"
                 w="$16"
@@ -318,6 +319,24 @@ const HomeScreen = ({navigation}: any) => {
               </Box>
               <Text color="$teal600" fontWeight="$semibold">
                 প্রতিদিন জমা
+              </Text>
+            </VStack>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('DataExportImport')}>
+            <VStack alignItems="center" gap="$1">
+              <Box
+                h="$16"
+                w="$16"
+                bgColor="$teal600"
+                rounded="$md"
+                softShadow="1"
+                justifyContent="center"
+                alignItems="center">
+                <Entypo name="database" size={50} color="white" />
+              </Box>
+              <Text color="$teal600" fontWeight="$semibold">
+                ডাটা
               </Text>
             </VStack>
           </TouchableOpacity>

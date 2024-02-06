@@ -15,6 +15,7 @@ import WeeklyScreen from '../screens/Report/WeeklyScreen';
 import CalculatorScreen from '../screens/calculator/CalculatorScreen';
 import UpdateUserScreen from '../screens/users/UpdateUserScreen';
 import WeeklyInstallmentScreen from '../screens/users/WeeklyInstallmentScreen';
+import DataExportImportScreen from '../screens/dataScreen/DataExportImportScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +106,13 @@ function Routes() {
         <Stack.Screen
           name="ReportWeekly"
           component={WeeklyScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="DataExportImport"
+          component={DataExportImportScreen}
           options={{
             headerShown: false,
           }}
