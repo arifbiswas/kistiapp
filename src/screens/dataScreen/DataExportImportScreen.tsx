@@ -138,35 +138,111 @@ const DataExportImportScreen = () => {
     totals: ITotals;
     installments: IInstallment;
   }) => {
-    // first loaners
+    //----------------- totals start--------------------------
     realm.write(() => {
-      // uploadData?.loaners.forEach(item => {
-      //   console.log(item);
-      realm.create('Loaner', {
-        _id: Realm.BSON.ObjectId('65c5fe3da57dfe493821e475'),
-        address: '১২৬/১ মিরহাজীরবাগ',
-        createdAt: '2024-02-09T10:28:13.884Z',
-        day: 9,
-        extraCharge: 150,
-        fatherName: 'ইউনুছ বিশ্বাস',
-        isLoss: false,
-        loanAmount: 5000,
-        loanLead: 11,
-        mobile: 1871063074,
-        month: 2,
-        motherName: 'মোর্শেদা বেগম',
-        name: 'আরিফ বিশ্বাস',
-        nid: 46416414654,
-        profit: 1500,
-        referAddress: '১৫০ মিরহাজীবাগ',
-        referMobile: 1871063074,
-        referName: 'আলি ভাই',
-        totalInstallment: 6000,
-        updatedAt: '2024-02-09T10:28:13.884Z',
-        year: 2024,
+      uploadData?.totals.forEach(item => {
+        const check = realm
+          .objectForPrimaryKey('Totals', Realm.BSON.ObjectId(item._id))
+          ?.isValid();
+
+        if (!check) {
+          realm.create('Totals', {
+            _id: Realm.BSON.ObjectId(item._id),
+            totalBalance: item.totalBalance,
+            totalComes: item.totalComes,
+            totalLoan: item.totalLoan,
+          });
+        }
       });
-      // });
     });
+    //----------------- totals end--------------------------
+
+    //----------------- balance start -------------------------------
+    realm.write(() => {
+      uploadData?.balance.forEach(item => {
+        const check = realm
+          .objectForPrimaryKey('Balance', Realm.BSON.ObjectId(item._id))
+          ?.isValid();
+
+        if (!check) {
+          realm.create('Balance', {
+            _id: Realm.BSON.ObjectId(item._id),
+            balance: item.balance,
+            createdAt: item.createdAt,
+            day: item.day,
+            month: item.month,
+            updatedAt: item.updatedAt,
+            year: item.year,
+          });
+        }
+      });
+    });
+    //----------------- balance end -------------------------------
+
+    //---------------------  loaners start -----------------------------
+    realm.write(() => {
+      uploadData?.loaners.forEach(item => {
+        const check = realm
+          .objectForPrimaryKey('Loaner', Realm.BSON.ObjectId(item._id))
+          ?.isValid();
+
+        if (!check) {
+          realm.create('Loaner', {
+            _id: Realm.BSON.ObjectId(item._id),
+            address: item.address,
+            createdAt: item.createdAt,
+            day: item.day,
+            extraCharge: item.extraCharge,
+            fatherName: item.fatherName,
+            isLoss: item.isLoss,
+            loanAmount: item.loanAmount,
+            loanLead: item.loanLead,
+            mobile: item.mobile,
+            month: item.month,
+            motherName: item.motherName,
+            name: item.name,
+            nid: item.nid,
+            profit: item.profit,
+            referAddress: item.referAddress,
+            referMobile: item.referMobile,
+            referName: item.referName,
+            totalInstallment: item.totalInstallment,
+            updatedAt: item.updatedAt,
+            year: item.year,
+          });
+        }
+      });
+    });
+    //---------------------  loaners end -----------------------------
+
+    // ------------------ installments start --------------------------
+    realm.write(() => {
+      uploadData?.installments.forEach(item => {
+        const check = realm
+          .objectForPrimaryKey('Installments', Realm.BSON.ObjectId(item._id))
+          ?.isValid();
+
+        if (!check) {
+          realm.create('Installments', {
+            _id: Realm.BSON.ObjectId(item._id),
+            amount: item.amount,
+            createdAt: item.createdAt,
+            day: item.day,
+            month: item.month,
+            updatedAt: item.updatedAt,
+            userId: Realm.BSON.ObjectId(item.userId),
+            year: item.year,
+          });
+        }
+      });
+    });
+    // ------------------ installments end --------------------------
+    setUploadData(null);
+    ToastAndroid.showWithGravity(
+      'পূর্বের সব তথ্য এক সাথে সংযোগ করা হয়েছে',
+      ToastAndroid.LONG,
+      ToastAndroid.CENTER,
+    );
   };
 
   const uploadDatabase = async (path: string) => {
@@ -205,7 +281,7 @@ const DataExportImportScreen = () => {
   }, [modalOpen, currentPath]);
 
   // console.log(currentPath === '/storage/emulated/0');
-
+  console.log(uploadData);
   return (
     <GlueStackProvider height="100%">
       <HeaderPlusBack />

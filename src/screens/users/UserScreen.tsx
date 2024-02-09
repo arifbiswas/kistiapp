@@ -39,7 +39,7 @@ const UserScreen = ({navigation}: any) => {
   const allLoaner = useQuery<ILoner>('Loaner');
 
   const totals = useQuery<ITotals>('Totals').find(item => item);
-  // console.log(allLoaner);
+  console.log(allLoaner[0]);
   // console.log(totals);
 
   const [data, setData] = React.useState({
