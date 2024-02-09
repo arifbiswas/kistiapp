@@ -93,24 +93,20 @@ const HomeScreen = ({navigation}: any) => {
             </TouchableOpacity> */}
             {/* setting end*/}
           </HStack>
-          <Center mx={'2%'}>
-            <HStack gap="$7">
+          <Box paddingHorizontal="$10">
+            <HStack justifyContent="space-between">
               <Text color="$white">সদস্য : {allLoaner.length} জন</Text>
-              <Box h="$6">
-                <Divider orientation="vertical" bgColor="$teal700" />
-              </Box>
+
               <Text color="$white">
                 লাভ :{' '}
                 {totals?.totalComes && totals?.totalLoan
                   ? totals?.totalComes - totals?.totalLoan
                   : 0}
               </Text>
-              <Box h="$6">
-                <Divider orientation="vertical" bgColor="$teal700" />
-              </Box>
+
               <Text color="$white">ক্ষতি : {totalLossLoanAmount}</Text>
             </HStack>
-          </Center>
+          </Box>
 
           <VStack mx="4%" gap="-$3">
             <HStack alignItems="center" pt="$2" justifyContent="space-between">
@@ -148,15 +144,13 @@ const HomeScreen = ({navigation}: any) => {
                 </Heading>
               </HStack>
             </Box> */}
-          <Center mt="$3">
-            <HStack gap="$7">
+          <Box paddingHorizontal="$10" mt="$3">
+            <HStack justifyContent="space-around">
               <Text color="$white">
                 {' '}
                 মোট ঋণ : {totals?.totalLoan ? totals?.totalLoan : 0}
               </Text>
-              <Box h="$6">
-                <Divider orientation="vertical" bgColor="$teal700" />
-              </Box>
+
               {/* <Text color="$white">
                 মোট :{' '}
                 {totals?.totalBalance &&
@@ -166,9 +160,7 @@ const HomeScreen = ({navigation}: any) => {
                     totalLossLoanAmount
                   : 0}
               </Text> */}
-              <Box h="$6">
-                <Divider orientation="vertical" bgColor="$teal700" />
-              </Box>
+
               <Text color="$white">
                 সর্ব মোট :{' '}
                 {totals?.totalBalance && totals?.totalComes && totalExtraAmount
@@ -176,7 +168,7 @@ const HomeScreen = ({navigation}: any) => {
                   : 0}
               </Text>
             </HStack>
-          </Center>
+          </Box>
         </Box>
 
         <HStack mt="$12" mx="4%" justifyContent="space-between">

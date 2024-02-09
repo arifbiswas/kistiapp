@@ -5,7 +5,7 @@ import Routes from '../routes/Routes';
 
 // Loaner Modal
 class Loaner extends Realm.Object<Loaner> {
-  _id!: Realm.BSON.ObjectId;
+  _id!: Realm.BSON.ObjectId | string;
   name!: string;
   fatherName!: string;
   motherName!: string;
@@ -25,7 +25,10 @@ class Loaner extends Realm.Object<Loaner> {
     embedded: false,
     asymmetric: false,
     properties: {
-      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      _id: {
+        type: 'objectId' || 'string',
+        default: () => new Realm.BSON.ObjectId(),
+      },
       name: 'string',
       fatherName: 'string',
       motherName: 'string',
@@ -67,13 +70,16 @@ class Loaner extends Realm.Object<Loaner> {
 }
 // Blance Modal
 class Balance extends Realm.Object<Balance> {
-  _id!: Realm.BSON.ObjectId;
+  _id!: Realm.BSON.ObjectId | string;
   balance!: number;
 
   static schema: ObjectSchema = {
     name: 'Balance',
     properties: {
-      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      _id: {
+        type: 'objectId' || 'string',
+        default: () => new Realm.BSON.ObjectId(),
+      },
       balance: 'int',
       day: {
         type: 'int',
@@ -102,14 +108,17 @@ class Balance extends Realm.Object<Balance> {
 
 // Weekly Installments Modal
 class Installments extends Realm.Object<Installments> {
-  _id!: Realm.BSON.ObjectId;
+  _id!: Realm.BSON.ObjectId | string;
   amount!: number;
   userId!: Realm.BSON.ObjectId;
 
   static schema: ObjectSchema = {
     name: 'Installments',
     properties: {
-      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      _id: {
+        type: 'objectId' || 'string',
+        default: () => new Realm.BSON.ObjectId(),
+      },
       userId: 'objectId',
       amount: 'int',
       day: {
@@ -138,12 +147,15 @@ class Installments extends Realm.Object<Installments> {
 }
 // Totals Modal
 class Totals extends Realm.Object<Totals> {
-  _id!: Realm.BSON.ObjectId;
+  _id!: Realm.BSON.ObjectId | string;
 
   static schema: ObjectSchema = {
     name: 'Totals',
     properties: {
-      _id: {type: 'objectId', default: () => new Realm.BSON.ObjectId()},
+      _id: {
+        type: 'objectId' || 'string',
+        default: () => new Realm.BSON.ObjectId(),
+      },
       totalBalance: {
         type: 'int',
         default: () => 0,

@@ -1,4 +1,4 @@
-package com.reactnativeapp;
+package com.kisti;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
