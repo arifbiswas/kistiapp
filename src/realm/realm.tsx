@@ -4,6 +4,7 @@ import {createRealmContext} from '@realm/react';
 import Routes from '../routes/Routes';
 import {Balance, Installments, Loaner, Totals} from './modals/modals';
 import SplashScreen from 'react-native-splash-screen';
+
 // Loaner Modal
 
 // Create a configuration object

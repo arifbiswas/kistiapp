@@ -65,7 +65,7 @@ const HomeScreen = ({navigation}: any) => {
       <Box height={'100%'} bg="$white">
         <Box
           width={'100%'}
-          height={'39%'}
+          height={280}
           bgColor="$teal600"
           softShadow="1"
           px={'2%'}
@@ -73,8 +73,7 @@ const HomeScreen = ({navigation}: any) => {
           borderBottomStartRadius={10}>
           {/* setting start*/}
           <HStack
-            pt="$1"
-            pb="$6"
+            pt="$3"
             justifyContent="space-between"
             gap="$1"
             alignItems="center">
@@ -93,45 +92,49 @@ const HomeScreen = ({navigation}: any) => {
             </TouchableOpacity> */}
             {/* setting end*/}
           </HStack>
-          <Box paddingHorizontal="$10">
-            <HStack justifyContent="space-between">
-              <Text color="$white">সদস্য : {allLoaner.length} জন</Text>
+          <Box flex={1} justifyContent="center">
+            <Box paddingHorizontal="$10">
+              <HStack justifyContent="space-between">
+                <Text color="$white">সদস্য : {allLoaner.length} জন</Text>
 
-              <Text color="$white">
-                লাভ :{' '}
-                {totals?.totalComes && totals?.totalLoan
-                  ? totals?.totalComes - totals?.totalLoan
-                  : 0}
-              </Text>
+                <Text color="$white">
+                  লাভ :{' '}
+                  {totals?.totalComes && totals?.totalLoan
+                    ? totals?.totalComes - totals?.totalLoan
+                    : 0}
+                </Text>
 
-              <Text color="$white">ক্ষতি : {totalLossLoanAmount}</Text>
-            </HStack>
-          </Box>
+                <Text color="$white">ক্ষতি : {totalLossLoanAmount}</Text>
+              </HStack>
+            </Box>
 
-          <VStack mx="4%" gap="-$3">
-            <HStack alignItems="center" pt="$2" justifyContent="space-between">
-              <Text size="4xl" color="$white" fontWeight="bold">
-                ব্যালেন্স :{' '}
-              </Text>
-              <Heading size="4xl" color="$white">
-                {totals?.totalBalance ? totals?.totalBalance : 0}
-              </Heading>
-            </HStack>
-            {/* debt start*/}
+            <VStack mx="4%" gap="-$3">
+              <HStack
+                alignItems="center"
+                pt="$2"
+                justifyContent="space-between">
+                <Text size="4xl" color="$white" fontWeight="bold">
+                  ব্যালেন্স :{' '}
+                </Text>
+                <Heading size="4xl" color="$white">
+                  {totals?.totalBalance ? totals?.totalBalance : 0}
+                </Heading>
+              </HStack>
+              {/* debt start*/}
 
-            <HStack
-              alignItems="center"
-              // pb="$1"
-              justifyContent="space-between">
-              <Text size="4xl" color="$white" fontWeight="bold">
-                পাওনা :{' '}
-              </Text>
-              <Heading size="4xl" color="$white">
-                {totals?.totalComes ? totals?.totalComes : 0}
-              </Heading>
-            </HStack>
-          </VStack>
-          {/* <Box mx="4%" pt="$1">
+              <HStack
+                alignItems="center"
+                // pb="$1"
+                justifyContent="space-between">
+                <Text size="4xl" color="$white" fontWeight="bold">
+                  পাওনা :{' '}
+                </Text>
+                <Heading size="4xl" color="$white">
+                  {totals?.totalComes ? totals?.totalComes : 0}
+                </Heading>
+              </HStack>
+            </VStack>
+            {/* <Box mx="4%" pt="$1">
               <HStack
                 alignItems="center"
                 // pb="$2"
@@ -144,14 +147,14 @@ const HomeScreen = ({navigation}: any) => {
                 </Heading>
               </HStack>
             </Box> */}
-          <Box paddingHorizontal="$10" mt="$3">
-            <HStack justifyContent="space-around">
-              <Text color="$white">
-                {' '}
-                মোট ঋণ : {totals?.totalLoan ? totals?.totalLoan : 0}
-              </Text>
+            <Box paddingHorizontal="$10" mt="$3">
+              <HStack justifyContent="space-around">
+                <Text color="$white">
+                  {' '}
+                  মোট ঋণ : {totals?.totalLoan ? totals?.totalLoan : 0}
+                </Text>
 
-              {/* <Text color="$white">
+                {/* <Text color="$white">
                 মোট :{' '}
                 {totals?.totalBalance &&
                 (totals?.totalLoan || totalLossLoanAmount)
@@ -161,13 +164,18 @@ const HomeScreen = ({navigation}: any) => {
                   : 0}
               </Text> */}
 
-              <Text color="$white">
-                সর্ব মোট :{' '}
-                {totals?.totalBalance && totals?.totalComes && totalExtraAmount
-                  ? totals?.totalBalance + totals?.totalComes + totalExtraAmount
-                  : 0}
-              </Text>
-            </HStack>
+                <Text color="$white">
+                  সর্ব মোট :{' '}
+                  {totals?.totalBalance &&
+                  totals?.totalComes &&
+                  totalExtraAmount
+                    ? totals?.totalBalance +
+                      totals?.totalComes +
+                      totalExtraAmount
+                    : 0}
+                </Text>
+              </HStack>
+            </Box>
           </Box>
         </Box>
 

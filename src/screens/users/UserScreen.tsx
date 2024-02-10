@@ -39,7 +39,7 @@ const UserScreen = ({navigation}: any) => {
   const allLoaner = useQuery<ILoner>('Loaner');
 
   const totals = useQuery<ITotals>('Totals').find(item => item);
-  console.log(allLoaner[0]);
+  // console.log(allLoaner[0]);
   // console.log(totals);
 
   const [data, setData] = React.useState({
@@ -322,7 +322,7 @@ const UserScreen = ({navigation}: any) => {
           modalVisible={menuModal}
           setModalVisible={setMenuModal}
           backButton={true}
-          height="40%"
+          height={275}
           width="65%"
           // appearance={true}
         >

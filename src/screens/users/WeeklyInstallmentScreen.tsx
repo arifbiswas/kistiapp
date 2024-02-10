@@ -21,7 +21,7 @@ const WeeklyInstallmentScreen = ({route}: any) => {
   const installments = useQuery<IInstallment>('Installments', install => {
     return install.filtered('userId == $0', item._id);
   });
-  console.log(installments);
+  // console.log(installments);
   const [data, setData] = React.useState({
     amount: 500,
     userId: item._id,
@@ -63,6 +63,8 @@ const WeeklyInstallmentScreen = ({route}: any) => {
     },
     [data],
   );
+
+  const handlePrint = React.useCallback(async () => {}, []);
 
   return (
     <GlueStackProvider height="100%">
