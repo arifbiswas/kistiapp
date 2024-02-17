@@ -1,4 +1,4 @@
-import {ToastAndroid, TouchableOpacity} from 'react-native';
+import {PermissionsAndroid, ToastAndroid, TouchableOpacity} from 'react-native';
 import React from 'react';
 import GlueStackProvider from '../../gluestack_config/gluestackProvider';
 import HeaderPlusBack from '../../components/HeaderPlusBack';
@@ -14,7 +14,21 @@ import {
 import {IInstallment, ILoner, ITotals} from '../../types/interface';
 import {useQuery, useRealm} from '../../realm/realm';
 
-const WeeklyInstallmentScreen = ({route}: any) => {
+import {
+  USBPrinter,
+  NetPrinter,
+  BLEPrinter,
+} from 'react-native-thermal-receipt-printer';
+
+interface IBLEPrinter {
+  device_name: string;
+  inner_mac_address: string;
+}
+
+const WeeklyInstallmentScreen = ({route, navigation}: any) => {
+  const [printers, setPrinters] = React.useState([]);
+  const [currentPrinter, setCurrentPrinter] = React.useState();
+
   const realm = useRealm();
   const item: ILoner = route?.params?.item;
   const totals = useQuery<ITotals>('Totals').find(item => item);
@@ -64,7 +78,61 @@ const WeeklyInstallmentScreen = ({route}: any) => {
     [data],
   );
 
+  const getPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+        {
+          title: 'Please give bluetooth Permission',
+          message: ' App needs access to your bluetooth ',
+          // buttonNegative: 'Denied',
+          buttonNeutral: 'এখন না',
+
+          buttonPositive: 'ওকে',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use the bluetooth');
+      } else {
+        console.log('bluetooth permission denied');
+        // navigation.goBack();
+      }
+      return granted;
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
   const handlePrint = React.useCallback(async () => {}, []);
+  const automation = React.useCallback(async () => {
+    const granted = await getPermission();
+    if (granted == PermissionsAndroid.RESULTS.GRANTED) {
+      console.log(granted);
+      BLEPrinter.init().then(() => {
+        BLEPrinter.getDeviceList().then(setPrinters);
+      });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    automation();
+  }, []);
+
+  const _connectPrinter = printer => {
+    //connect printer
+    BLEPrinter.connectPrinter(printer.inner_mac_address).then(
+      setCurrentPrinter,
+      error => console.warn(error),
+    );
+  };
+
+  const printTextTest = () => {
+    currentPrinter && BLEPrinter.printText('<C>sample text</C>\n');
+  };
+
+  const printBillTest = () => {
+    currentPrinter && BLEPrinter.printBill('<C>sample bill</C>');
+  };
 
   return (
     <GlueStackProvider height="100%">

@@ -21,6 +21,7 @@ function AppWrapper() {
   useEffect(() => {
     SplashScreen.hide();
   });
+
   return (
     <RealmProvider>
       <Routes />

@@ -25,6 +25,8 @@ import {useQuery, useRealm} from '../../realm/realm';
 import {IBalance, ILoner, ITotals} from '../../types/interface';
 import {ToastAndroid} from 'react-native';
 
+// Example usage
+
 const HomeScreen = ({navigation}: any) => {
   const realm = useRealm();
   const allLoaner = useQuery<ILoner>('Loaner');
