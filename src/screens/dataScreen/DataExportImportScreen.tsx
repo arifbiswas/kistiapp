@@ -6,7 +6,15 @@ import {
 } from 'react-native';
 import React, {useCallback, useEffect} from 'react';
 import GlueStackProvider from '../../gluestack_config/gluestackProvider';
-import {Box, FlatList, HStack, Text, VStack} from '@gluestack-ui/themed';
+import {
+  Box,
+  FlatList,
+  HStack,
+  Input,
+  InputField,
+  Text,
+  VStack,
+} from '@gluestack-ui/themed';
 import HeaderPlusBack from '../../components/HeaderPlusBack';
 
 import RNFS from 'react-native-fs';
@@ -17,6 +25,7 @@ import CustomModal from '../../components/customModal/CustomModal';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
 import Realm from 'realm';
+import {GColors} from '../../Styles/GColors';
 
 interface IDatabase {
   loaners: [ILoner];
@@ -33,6 +42,8 @@ const DataExportImportScreen = () => {
     RNFS.DownloadDirectoryPath,
   );
   const [modalOpen, setOpenModal] = React.useState(false);
+  const [isExport, setIsExport] = React.useState(false);
+  const [exportTextName, setExportTextName] = React.useState('');
   const [pathData, setPathData] = React.useState([]);
   const [uploadData, setUploadData] = React.useState<IDatabase | never>();
   const loaners = useQuery<ILoner>('Loaner');
@@ -71,39 +82,48 @@ const DataExportImportScreen = () => {
   // console.log(currentPath);
   const database = {loaners, totals, installments, balance};
   const handleExportData = () => {
+    if (!exportTextName) {
+      ToastAndroid.showWithGravity(
+        'ডেটাবেসের সুন্দর একটি নাম দিন !',
+        ToastAndroid.SHORT,
+        ToastAndroid.CENTER,
+      );
+      return;
+    }
     // console.log(RNFS.mkdir(RNFS.DownloadDirectoryPath + 'Lol'));
-    Alert.alert(
-      'সকল তথ্য সংগ্রহ করতে চান ?',
-      'ডাউনলোড ফোলডারে ডেটাবেস নামে একটি ফাইল তৈরি করা হবে' +
-        ' ' +
-        'সেখান থেকে পুনোড়ায় ফাইলটি ব্যবহার করে সকল তথ্য আবার আনা যাবে',
-      [
-        {
-          text: 'না',
-        },
-        {
-          text: 'জ্বি',
-          onPress: () => {
-            RNFS.writeFile(
-              RNFS.DownloadDirectoryPath + '/database.json',
-              JSON.stringify(database),
-              'utf8',
-            )
-              .then(success => {
-                console.log(success);
-                ToastAndroid.showWithGravity(
-                  'সকল তথ্য সংগ্রহ করা হয়েছে',
-                  ToastAndroid.SHORT,
-                  ToastAndroid.CENTER,
-                );
-              })
-              .catch(err => {
-                console.log(err.message);
-              });
-          },
-        },
-      ],
-    );
+    RNFS.writeFile(
+      RNFS.DownloadDirectoryPath + '/' + (exportTextName + '.json'),
+      JSON.stringify(database),
+      'utf8',
+    )
+      .then(success => {
+        console.log(success);
+        ToastAndroid.showWithGravity(
+          'সকল তথ্য সংগ্রহ করা হয়েছে' +
+            `${RNFS.DownloadDirectoryPath}/${exportTextName}.json`,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER,
+        );
+        setExportTextName('');
+        setIsExport(false);
+        setOpenModal(!modalOpen);
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
+  };
+
+  const uploadDatabase = async (path: string) => {
+    // console.log(path);
+    setOpenModal(false);
+    const data = RNFS.readFile(path, 'utf8')
+      .then(contents => {
+        // log the file contents
+        setUploadData(JSON.parse(contents));
+      })
+      .catch(err => {
+        console.log(err.message, err.code);
+      });
   };
 
   const handleDeletedData = () => {
@@ -245,19 +265,6 @@ const DataExportImportScreen = () => {
     );
   };
 
-  const uploadDatabase = async (path: string) => {
-    // console.log(path);
-    setOpenModal(false);
-    const data = RNFS.readFile(path, 'utf8')
-      .then(contents => {
-        // log the file contents
-        setUploadData(JSON.parse(contents));
-      })
-      .catch(err => {
-        console.log(err.message, err.code);
-      });
-  };
-
   //------------------ আগুন শেষ 💫----------------------
 
   const automation = useCallback(async () => {
@@ -266,7 +273,7 @@ const DataExportImportScreen = () => {
     if (currentPath && granted == PermissionsAndroid.RESULTS.GRANTED) {
       RNFS.readDir(currentPath)
         .then(result => {
-          if (result.length !== 0) {
+          if (result) {
             setPathData(result);
           }
         })
@@ -274,11 +281,11 @@ const DataExportImportScreen = () => {
           console.log(error);
         });
     }
-  }, [modalOpen, currentPath]);
+  }, [modalOpen, currentPath, exportTextName]);
 
   useEffect(() => {
     automation();
-  }, [modalOpen, currentPath]);
+  }, [modalOpen, currentPath, exportTextName]);
 
   // console.log(currentPath === '/storage/emulated/0');
   console.log(uploadData);
@@ -287,21 +294,10 @@ const DataExportImportScreen = () => {
       <HeaderPlusBack />
 
       <VStack mt="$2" gap="$4">
-        <TouchableOpacity
-          onPress={() => {
-            handleExportData();
-          }}
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Box w={'50%'} bg="$teal600" py="$3" rounded="$md">
-            <Text color="$white" textAlign="center">
-              তথ্য সংগ্রহ করুন
-            </Text>
-          </Box>
-        </TouchableOpacity>
         <Box paddingHorizontal="$4" mt="$2">
+          <Text fontWeight="$bold" color="$teal600" size="xs">
+            বর্তমান ডেটাবেস
+          </Text>
           <HStack justifyContent="space-between">
             <Text fontWeight="$bold" width="30%">
               গ্রাহকের তথ্য :
@@ -356,21 +352,72 @@ const DataExportImportScreen = () => {
             </Text>
           </HStack>
         </Box>
+        <Box>
+          <Text mx="$4" size="sm" my="$1">
+            Export Folder :
+          </Text>
+          <HStack
+            borderColor="$blueGray400"
+            borderWidth="$1"
+            mx="$4"
+            justifyContent="space-between"
+            alignItems="center"
+            rounded="$md">
+            <Text mx="$3">/{currentPath.split('/').slice(-1)}</Text>
 
-        <TouchableOpacity
-          onPress={() => {
-            setOpenModal(!modalOpen);
-          }}
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Box w={'50%'} bg="$teal600" py="$3" rounded="$md">
-            <Text color="$white" textAlign="center">
-              তথ্য আনুন
-            </Text>
-          </Box>
-        </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setIsExport(true);
+                setOpenModal(!modalOpen);
+              }}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Box
+                p="$1"
+                rounded="$md"
+                borderColor="$blueGray400"
+                borderWidth="$1"
+                px="$3">
+                <FontAwesome name="folder" size={30} color={GColors.primary} />
+              </Box>
+            </TouchableOpacity>
+          </HStack>
+        </Box>
+        <Box>
+          <Text mx="$4" size="sm" my="$1">
+            Import Folder :
+          </Text>
+          <HStack
+            borderColor="$blueGray400"
+            borderWidth="$1"
+            mx="$4"
+            justifyContent="space-between"
+            alignItems="center"
+            rounded="$md">
+            <Text mx="$3">/{currentPath.split('/').slice(-1)}</Text>
+
+            <TouchableOpacity
+              onPress={() => {
+                setOpenModal(!modalOpen);
+              }}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Box
+                p="$1"
+                rounded="$md"
+                borderColor="$blueGray400"
+                borderWidth="$1"
+                px="$3">
+                <FontAwesome name="folder" size={30} color={GColors.primary} />
+              </Box>
+            </TouchableOpacity>
+          </HStack>
+        </Box>
+
         {uploadData?.loaners && (
           <Box paddingHorizontal="$4" mt="$2">
             <HStack justifyContent="space-between">
@@ -442,26 +489,13 @@ const DataExportImportScreen = () => {
             </TouchableOpacity>
           </Box>
         )}
-        <TouchableOpacity
-          onPress={() => {
-            handleDeletedData();
-          }}
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Box w={'50%'} bg="$red600" py="$3" mt="10%" rounded="$md">
-            <Text color="$white" textAlign="center">
-              সকল তথ্য মুছে ফেলুন
-            </Text>
-          </Box>
-        </TouchableOpacity>
       </VStack>
       <CustomModal
         modalVisible={modalOpen}
         appearance
         setModalVisible={setOpenModal}
-        backButton
+        backButton={isExport ? false : true}
+        height={450}
         Radius={20}>
         <Box>
           <HStack gap="$3">
@@ -489,7 +523,7 @@ const DataExportImportScreen = () => {
             </TouchableOpacity>
             <Text>/{currentPath.split('/').slice(-1)}</Text>
           </HStack>
-          <Box my="$5" height={'85%'}>
+          <Box my="$5" h={isExport ? 310 : 380}>
             <FlatList
               data={pathData}
               // numColumns={4}
@@ -500,8 +534,14 @@ const DataExportImportScreen = () => {
                 // alignItems: 'center',
               }}
               keyExtractor={(item, index) => index + item?.name}
+              ListEmptyComponent={() => (
+                <Box justifyContent="center" alignItems="center">
+                  <Text color="$blueGray300">No Found any Folder & Files</Text>
+                </Box>
+              )}
               renderItem={({item}) => (
                 <TouchableOpacity
+                  disabled={isExport}
                   onPress={() => {
                     try {
                       if (item.name.includes('.')) {
@@ -529,8 +569,66 @@ const DataExportImportScreen = () => {
               )}
             />
           </Box>
+          {isExport && (
+            <HStack gap="$2" alignItems="center">
+              <Input flex={1}>
+                <InputField
+                  color="$blueGray600"
+                  fontWeight="$semibold"
+                  placeholder="file name"
+                  onChangeText={(text: string) => setExportTextName(text)}
+                  value={exportTextName}
+                />
+              </Input>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setIsExport(false);
+                  setOpenModal(!modalOpen);
+                }}>
+                <Box
+                  justifyContent="center"
+                  alignItems="center"
+                  py="$2"
+                  px="$4"
+                  bgColor="$red800"
+                  rounded="$md">
+                  <Text color="$white">Cancel</Text>
+                </Box>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  handleExportData();
+                }}>
+                <Box
+                  justifyContent="center"
+                  alignItems="center"
+                  py="$2"
+                  px="$4"
+                  bgColor="$teal600"
+                  rounded="$md">
+                  <Text color="$white">Save</Text>
+                </Box>
+              </TouchableOpacity>
+            </HStack>
+          )}
         </Box>
       </CustomModal>
+      <TouchableOpacity
+        onPress={() => {
+          handleDeletedData();
+        }}
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Box w={'50%'} bg="$red800" py="$3" mt="10%" rounded="$md">
+          <Text color="$white" textAlign="center">
+            সকল তথ্য মুছে ফেলুন
+          </Text>
+        </Box>
+      </TouchableOpacity>
     </GlueStackProvider>
   );
 };
