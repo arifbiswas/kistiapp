@@ -47,3 +47,10 @@ export interface ITotals {
   totalLoan?: number;
   totalComes?: number;
 }
+export interface IPrinter {
+  _id?: Realm.BSON.ObjectId;
+  device_name?: string;
+  inner_mac_address?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}

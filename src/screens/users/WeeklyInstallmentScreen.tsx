@@ -1,5 +1,11 @@
-import {PermissionsAndroid, ToastAndroid, TouchableOpacity} from 'react-native';
+import {
+  PermissionsAndroid,
+  ToastAndroid,
+  TouchableOpacity,
+  LogBox,
+} from 'react-native';
 import React from 'react';
+LogBox.ignoreLogs(['new NativeEventEmitter']);
 import GlueStackProvider from '../../gluestack_config/gluestackProvider';
 import HeaderPlusBack from '../../components/HeaderPlusBack';
 import {
@@ -10,15 +16,22 @@ import {
   InputField,
   ScrollView,
   Text,
+  FlatList,
 } from '@gluestack-ui/themed';
 import {IInstallment, ILoner, ITotals} from '../../types/interface';
 import {useQuery, useRealm} from '../../realm/realm';
 
+// import {
+//   BLEPrinter,
+// } from 'react-native-thermal-receipt-printer';
+
 import {
-  USBPrinter,
-  NetPrinter,
-  BLEPrinter,
-} from 'react-native-thermal-receipt-printer';
+  COMMANDS,
+  ColumnAlignment,
+} from 'react-native-thermal-receipt-printer-image-qr';
+
+import {BleManager} from 'react-native-ble-plx';
+import CustomModal from '../../components/customModal/CustomModal';
 
 interface IBLEPrinter {
   device_name: string;
@@ -26,6 +39,11 @@ interface IBLEPrinter {
 }
 
 const WeeklyInstallmentScreen = ({route, navigation}: any) => {
+  const savePrinter = useQuery<IBLEPrinter>('Printer');
+
+  const BLT = new BleManager();
+  const [modalOpen, setOpenModal] = React.useState(false);
+  const [bluetoothEnable, setBluetoothEnable] = React.useState(false);
   const [printers, setPrinters] = React.useState([]);
   const [currentPrinter, setCurrentPrinter] = React.useState();
 
@@ -80,59 +98,87 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
 
   const getPermission = async () => {
     try {
-      const granted = await PermissionsAndroid.request(
+      const granted = await PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-        {
-          title: 'Please give bluetooth Permission',
-          message: ' App needs access to your bluetooth ',
-          // buttonNegative: 'Denied',
-          buttonNeutral: 'এখন না',
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+      ]);
 
-          buttonPositive: 'ওকে',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You can use the bluetooth');
-      } else {
-        console.log('bluetooth permission denied');
-        // navigation.goBack();
-      }
       return granted;
     } catch (err) {
       console.warn(err);
     }
   };
 
-  const handlePrint = React.useCallback(async () => {}, []);
   const automation = React.useCallback(async () => {
     const granted = await getPermission();
-    if (granted == PermissionsAndroid.RESULTS.GRANTED) {
-      console.log(granted);
+    if (
+      granted?.['android.permission.ACCESS_FINE_LOCATION'] ==
+      PermissionsAndroid.RESULTS.GRANTED
+    ) {
       BLEPrinter.init().then(() => {
         BLEPrinter.getDeviceList().then(setPrinters);
       });
     }
   }, []);
 
-  React.useEffect(() => {
-    automation();
-  }, []);
-
   const _connectPrinter = printer => {
     //connect printer
-    BLEPrinter.connectPrinter(printer.inner_mac_address).then(
-      setCurrentPrinter,
-      error => console.warn(error),
-    );
+    // console.log(printer);
+    // BLEPrinter.connectPrinter(printer.inner_mac_address).then(
+    //   () => {
+    //     setCurrentPrinter(printer);
+    //     setOpenModal(false);
+    //     realm.write(() => {
+    //       savePrinter.forEach(lolPrinter => {
+    //         realm.delete(lolPrinter);
+    //       });
+    //       realm.create('Printer', {
+    //         ...printer,
+    //       });
+    //     });
+    //   },
+    //   error => console.log(error),
+    // );
   };
 
-  const printTextTest = () => {
-    currentPrinter && BLEPrinter.printText('<C>sample text</C>\n');
-  };
+  const handlePrint = React.useCallback(
+    async amount => {
+      setOpenModal(true);
+      automation();
+      if (currentPrinter?.inner_mac_address) {
+        //   BLEPrinter.printText(`id : ${item._id} \n
+        // নাম : ${item.name}\n
+        // ঠিকানা : ${item.address}\n
+        // -----------------------\n
+        // bill           : ${amount}
+        // `);
+      } else {
+        if (savePrinter[0]._id) {
+          // console.log(savePrinter[0].inner_mac_address);
+          try {
+            // BLEPrinter.connectPrinter(savePrinter[0].inner_mac_address).then(
+            //   setCurrentPrinter({
+            //     device_name: savePrinter[0].device_name,
+            //     inner_mac_address: savePrinter[0].inner_mac_address,
+            //   }),
+            //   error => console.log(error),
+            // );
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+        }
+      }
+    },
+    [currentPrinter, printers],
+  );
 
-  const printBillTest = () => {
-    currentPrinter && BLEPrinter.printBill('<C>sample bill</C>');
-  };
+  // const printBillTest = () => {
+  //   currentPrinter && BLEPrinter.printBill('<C>sample bill</C>');
+  // };
+
+  console.log('lol' + currentPrinter);
 
   return (
     <GlueStackProvider height="100%">
@@ -177,7 +223,10 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
                 <Text color="$teal600" fontWeight="bold">
                   {item.amount}
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    handlePrint(item.amount);
+                  }}>
                   <Box bgColor="$teal600" py="$1" px="$3" rounded="$md">
                     <Text color="$white" fontWeight="$bold">
                       প্রিন্ট
@@ -189,6 +238,60 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
           ))}
         </Box>
       </ScrollView>
+      <CustomModal
+        modalVisible={modalOpen}
+        appearance
+        setModalVisible={setOpenModal}
+        backButton
+        height={450}
+        Radius={20}>
+        <Box>
+          <HStack gap="$3">
+            <TouchableOpacity onPress={() => {}}>
+              <Box bg={'$teal600'} py="$1" px="$3" rounded="$md">
+                <Text color="$white">Back</Text>
+              </Box>
+            </TouchableOpacity>
+            <Text></Text>
+          </HStack>
+          <Box my="$5" h={380}>
+            <FlatList
+              data={printers}
+              // numColumns={4}
+
+              contentContainerStyle={{
+                // justifyContent: 'center',
+                gap: 20,
+                // alignItems: 'center',
+              }}
+              keyExtractor={item => item.inner_mac_address}
+              ListEmptyComponent={() => (
+                <Box justifyContent="center" alignItems="center">
+                  <Text color="$blueGray300">No Found any Folder & Files</Text>
+                </Box>
+              )}
+              renderItem={({item}) => (
+                <Box bgColor="$coolGray100" rounded="$md" py="$2" px="$5">
+                  <HStack justifyContent="space-between" alignItems="center">
+                    <Box>
+                      <Text>{item.device_name}</Text>
+                      <Text>{item.inner_mac_address}</Text>
+                    </Box>
+                    <TouchableOpacity
+                      onPress={() => {
+                        _connectPrinter(item);
+                      }}>
+                      <Box bgColor="$teal600" p="$2" rounded="$md">
+                        <Text color="$white">Connect</Text>
+                      </Box>
+                    </TouchableOpacity>
+                  </HStack>
+                </Box>
+              )}
+            />
+          </Box>
+        </Box>
+      </CustomModal>
     </GlueStackProvider>
   );
 };

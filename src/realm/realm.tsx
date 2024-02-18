@@ -2,14 +2,14 @@ import React, {useEffect} from 'react';
 import Realm from 'realm';
 import {createRealmContext} from '@realm/react';
 import Routes from '../routes/Routes';
-import {Balance, Installments, Loaner, Totals} from './modals/modals';
+import {Balance, Installments, Loaner, Printer, Totals} from './modals/modals';
 import SplashScreen from 'react-native-splash-screen';
 
 // Loaner Modal
 
 // Create a configuration object
 const realmConfig: Realm.Configuration = {
-  schema: [Loaner, Balance, Installments, Totals],
+  schema: [Loaner, Balance, Installments, Totals, Printer],
 };
 
 // Create a realm context

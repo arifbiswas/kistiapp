@@ -1,5 +1,32 @@
 import Realm, {ObjectSchema} from 'realm';
 
+export class Printer extends Realm.Object<Printer> {
+  _id!: Realm.BSON.ObjectId | string;
+  name!: string;
+
+  static schema: ObjectSchema = {
+    name: 'Printer',
+    properties: {
+      _id: {
+        type: 'objectId' || 'string',
+        default: () => new Realm.BSON.ObjectId(),
+      },
+      device_name: 'string',
+      inner_mac_address: 'string',
+
+      createdAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+      updatedAt: {
+        type: 'date',
+        default: () => new Date(),
+      },
+    },
+    primaryKey: '_id',
+  };
+}
+
 export class Loaner extends Realm.Object<Loaner> {
   _id!: Realm.BSON.ObjectId | string;
   name!: string;
