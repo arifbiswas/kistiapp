@@ -30,17 +30,19 @@ import {IBalance, ILoner, ITotals} from '../../types/interface';
 import {useObject, useQuery, useRealm} from '../../realm/realm';
 import Realm from 'realm';
 import {GColors} from '../../Styles/GColors';
+import CommonHeaderPlusBack from '../../components/customModal/CommonHeaderPlusBack';
 
 const UserScreen = ({navigation}: any) => {
   const [modal, setModal] = React.useState(false);
   const [menuModal, setMenuModal] = React.useState(false);
+  // const [searchText, setSearchText] = React.useState(null);
   const [selectItem, setSelectItem] = React.useState<ILoner>(null);
   const realm = useRealm();
   const allLoaner = useQuery<ILoner>('Loaner');
 
   const totals = useQuery<ITotals>('Totals').find(item => item);
   // console.log(allLoaner[0]);
-  // console.log(totals);
+  // console.log(searchText);
 
   const [data, setData] = React.useState({
     address: '১২৬/১ মিরহাজীরবাগ',
@@ -200,7 +202,7 @@ const UserScreen = ({navigation}: any) => {
   return (
     <GlueStackProvider>
       <Box h="100%" position="relative">
-        <HeaderPlusBack />
+        <CommonHeaderPlusBack isBack />
         <Box my="$2" px="$3">
           <Text color="$teal600" size="sm">
             মোট সদস্য : {allLoaner.length}

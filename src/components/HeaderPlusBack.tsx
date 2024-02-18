@@ -3,7 +3,7 @@ import React from 'react';
 import {Box, HStack, Text} from '@gluestack-ui/themed';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-const HeaderPlusBack = ({children}: any) => {
+const HeaderPlusBack = ({children, search}: any) => {
   const navigation = useNavigation();
   return (
     <Box

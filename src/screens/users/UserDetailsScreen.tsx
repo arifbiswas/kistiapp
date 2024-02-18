@@ -28,6 +28,10 @@ const UserDetailsScreen = ({route, navigation}: any) => {
         <Text size="4xl" fontWeight="bold" color="$white">
           {item?.name}
         </Text>
+
+        <Text size="sm" fontWeight="bold" color="$white">
+          ID : {`${item?._id}`}
+        </Text>
         {/* <AvatarImage
                     source={{
                       uri: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=80&q=60',
@@ -35,6 +39,7 @@ const UserDetailsScreen = ({route, navigation}: any) => {
                     alt="name"
                   /> */}
       </Box>
+
       <ScrollView>
         <VStack gap="$3" alignItems="center" my="$4" mx="$4">
           <Center>

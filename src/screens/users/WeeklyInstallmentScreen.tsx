@@ -18,42 +18,35 @@ import {
   Text,
   FlatList,
 } from '@gluestack-ui/themed';
-import {IInstallment, ILoner, ITotals} from '../../types/interface';
+import {IInstallment, ILoner, IPrinter, ITotals} from '../../types/interface';
 import {useQuery, useRealm} from '../../realm/realm';
 
-// import {
-//   BLEPrinter,
-// } from 'react-native-thermal-receipt-printer';
+// import {BLEPrinter} from 'react-native-thermal-receipt-printer';
 
 import {
-  COMMANDS,
+  BLEPrinter,
   ColumnAlignment,
+  COMMANDS,
+  IBLEPrinter,
 } from 'react-native-thermal-receipt-printer-image-qr';
-
-import {BleManager} from 'react-native-ble-plx';
 import CustomModal from '../../components/customModal/CustomModal';
-
-interface IBLEPrinter {
-  device_name: string;
-  inner_mac_address: string;
-}
+import {Alert} from 'react-native';
 
 const WeeklyInstallmentScreen = ({route, navigation}: any) => {
-  const savePrinter = useQuery<IBLEPrinter>('Printer');
+  const savePrinter = useQuery<IPrinter>('Printer');
 
-  const BLT = new BleManager();
   const [modalOpen, setOpenModal] = React.useState(false);
-  const [bluetoothEnable, setBluetoothEnable] = React.useState(false);
   const [printers, setPrinters] = React.useState([]);
   const [currentPrinter, setCurrentPrinter] = React.useState();
 
   const realm = useRealm();
   const item: ILoner = route?.params?.item;
+
   const totals = useQuery<ITotals>('Totals').find(item => item);
   const installments = useQuery<IInstallment>('Installments', install => {
     return install.filtered('userId == $0', item._id);
   });
-  // console.log(installments);
+
   const [data, setData] = React.useState({
     amount: 500,
     userId: item._id,
@@ -112,62 +105,82 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
 
   const automation = React.useCallback(async () => {
     const granted = await getPermission();
+
     if (
       granted?.['android.permission.ACCESS_FINE_LOCATION'] ==
       PermissionsAndroid.RESULTS.GRANTED
     ) {
-      BLEPrinter.init().then(() => {
-        BLEPrinter.getDeviceList().then(setPrinters);
-      });
+      BLEPrinter.init()
+        .then(() => {
+          BLEPrinter.getDeviceList().then(setPrinters);
+        })
+        .catch(error => {
+          console.log(error);
+          Alert.alert('Bluetooth Off', 'Turn on your bluetooth first');
+        });
     }
+    return granted;
   }, []);
 
-  const _connectPrinter = printer => {
-    //connect printer
-    // console.log(printer);
-    // BLEPrinter.connectPrinter(printer.inner_mac_address).then(
-    //   () => {
-    //     setCurrentPrinter(printer);
-    //     setOpenModal(false);
-    //     realm.write(() => {
-    //       savePrinter.forEach(lolPrinter => {
-    //         realm.delete(lolPrinter);
-    //       });
-    //       realm.create('Printer', {
-    //         ...printer,
-    //       });
-    //     });
-    //   },
-    //   error => console.log(error),
-    // );
+  const _connectPrinter = async printer => {
+    // connect printer
+    console.log(printer);
+    await BLEPrinter.connectPrinter(printer.inner_mac_address).then(
+      () => {
+        setCurrentPrinter(printer);
+        setOpenModal(false);
+        realm.write(() => {
+          savePrinter.forEach(lolPrinter => {
+            realm.delete(lolPrinter);
+          });
+          realm.create('Printer', {
+            ...printer,
+          });
+        });
+        ToastAndroid.showWithGravity(
+          `Connection is Ready`,
+          ToastAndroid.LONG,
+          ToastAndroid.CENTER,
+        );
+      },
+      error => {
+        console.log(error);
+        Alert.alert('Failed', 'I think your printer is off');
+      },
+    );
   };
 
   const handlePrint = React.useCallback(
-    async amount => {
-      setOpenModal(true);
-      automation();
+    async printData => {
+      await automation();
+      // console.log(currentPrinter);
       if (currentPrinter?.inner_mac_address) {
-        //   BLEPrinter.printText(`id : ${item._id} \n
-        // নাম : ${item.name}\n
-        // ঠিকানা : ${item.address}\n
-        // -----------------------\n
-        // bill           : ${amount}
-        // `);
-      } else {
+        // BLEPrinter.printText('আমি তোমায় ভালো বাষী', {encoding: 'CP864'});
+        BLEPrinter.printText(
+          `\n ----------------------------\n ID : ${item._id}\n NUMBER : ${item.mobile}\n NID : ${item.nid}\n DATE : ${printData.createdAt} \n ----------------------------
+          <C>BILL : ${printData.amount}</C> \n ----------------------------
+          \n\n\n\n`,
+        );
+      }
+      if (!currentPrinter?.inner_mac_address) {
         if (savePrinter[0]._id) {
-          // console.log(savePrinter[0].inner_mac_address);
+          console.log(savePrinter[0].inner_mac_address);
           try {
-            // BLEPrinter.connectPrinter(savePrinter[0].inner_mac_address).then(
-            //   setCurrentPrinter({
-            //     device_name: savePrinter[0].device_name,
-            //     inner_mac_address: savePrinter[0].inner_mac_address,
-            //   }),
-            //   error => console.log(error),
-            // );
+            BLEPrinter.connectPrinter(savePrinter[0].inner_mac_address).then(
+              setCurrentPrinter({
+                device_name: savePrinter[0].device_name,
+                inner_mac_address: savePrinter[0].inner_mac_address,
+              }),
+              error => {
+                console.log(error);
+                setOpenModal(true);
+              },
+            );
           } catch (error) {
             console.log(error);
           }
         } else {
+          setOpenModal(true);
         }
       }
     },
@@ -178,7 +191,7 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
   //   currentPrinter && BLEPrinter.printBill('<C>sample bill</C>');
   // };
 
-  console.log('lol' + currentPrinter);
+  // console.log(savePrinter);
 
   return (
     <GlueStackProvider height="100%">
@@ -225,7 +238,7 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    handlePrint(item.amount);
+                    handlePrint(item);
                   }}>
                   <Box bgColor="$teal600" py="$1" px="$3" rounded="$md">
                     <Text color="$white" fontWeight="$bold">
