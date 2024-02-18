@@ -40,10 +40,10 @@ const BalanceScreen = ({navigation}: any) => {
 
   const AllBalance = useQuery('Balance');
   const totals = useQuery<ITotals>('Totals').find(item => item);
-  console.log(totals);
+  // console.log(totals);
 
   const [data, setData] = React.useState({
-    balance: 50000,
+    balance: 0,
   });
   const saveNewLoner = React.useCallback(
     async (balance: IBalance) => {
@@ -297,18 +297,18 @@ const BalanceScreen = ({navigation}: any) => {
                 fontWeight="bold"
                 fontSize="$xs"
                 textAlign="center">
-                (ঋণ গ্রহনকারী)
+                (নতুন ব্যালেন্স)
               </Text>
               <VStack gap="$3">
                 <Input size="lg">
                   <InputField
-                    placeholder="মোবাইল"
+                    placeholder="পরিমাণ"
                     size="sm"
                     keyboardType="numeric"
                     onChangeText={text =>
                       setData({...data, balance: Number(text)})
                     }
-                    value={`${data.balance}`}
+                    // value={`${data.balance}`}
                   />
                 </Input>
               </VStack>

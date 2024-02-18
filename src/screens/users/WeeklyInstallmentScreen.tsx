@@ -48,7 +48,7 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
   });
 
   const [data, setData] = React.useState({
-    amount: 500,
+    amount: 0,
     userId: item._id,
   });
 
@@ -157,13 +157,17 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
       if (currentPrinter?.inner_mac_address) {
         // BLEPrinter.printText('আমি তোমায় ভালো বাষী', {encoding: 'CP864'});
         BLEPrinter.printText(
-          `\n ----------------------------\n ID : ${item._id}\n NUMBER : ${item.mobile}\n NID : ${item.nid}\n DATE : ${printData.createdAt} \n ----------------------------
+          `\n ----------------------------\n ID : ${item._id}\n NUMBER : ${
+            item.mobile
+          }\n NID : ${item.nid}\n DATE : ${new Date(
+            printData.createdAt,
+          ).toLocaleDateString()} \n ----------------------------
           <C>BILL : ${printData.amount}</C> \n ----------------------------
           \n\n\n\n`,
         );
       }
       if (!currentPrinter?.inner_mac_address) {
-        if (savePrinter[0]._id) {
+        if (savePrinter[0]?._id) {
           console.log(savePrinter[0].inner_mac_address);
           try {
             BLEPrinter.connectPrinter(savePrinter[0].inner_mac_address).then(
@@ -207,7 +211,7 @@ const WeeklyInstallmentScreen = ({route, navigation}: any) => {
               placeholder="টাকার পরিমাণ"
               keyboardType="numeric"
               onChangeText={value => setData({...data, amount: Number(value)})}
-              value={`${data.amount}`}
+              // value={`${data.amount}`}
             />
           </Input>
           <TouchableOpacity onPress={() => InstallmentHandler(data)}>

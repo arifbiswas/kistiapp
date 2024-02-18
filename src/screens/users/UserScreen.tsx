@@ -45,22 +45,35 @@ const UserScreen = ({navigation}: any) => {
   // console.log(searchText);
 
   const [data, setData] = React.useState({
-    address: '১২৬/১ মিরহাজীরবাগ',
-    extraCharge: 150,
-    fatherName: 'ইউনুছ বিশ্বাস',
-    loanAmount: 5000,
-    mobile: 1871063074,
-    motherName: 'মোর্শেদা বেগম',
-    name: 'আরিফ বিশ্বাস',
-    nid: 46416414654,
-    profit: 1500,
-    loanLead: 12,
+    address: '',
+    extraCharge: 0,
+    fatherName: '',
+    loanAmount: 0,
+    mobile: 0,
+    motherName: '',
+    name: '',
+    nid: 0,
+    profit: 0,
+    loanLead: 0,
     isLoss: false,
-    referAddress: '১৫০ মিরহাজীবাগ',
-    referMobile: 1871063074,
-    referName: 'আলি ভাই',
+    referAddress: '',
+    referMobile: 0,
+    referName: '',
   });
-
+  // address: '১২৬/১ মিরহাজীরবাগ',
+  // extraCharge: 150,
+  // fatherName: 'ইউনুছ বিশ্বাস',
+  // loanAmount: 5000,
+  // mobile: 1871063074,
+  // motherName: 'মোর্শেদা বেগম',
+  // name: 'আরিফ বিশ্বাস',
+  // nid: 46416414654,
+  // profit: 1500,
+  // loanLead: 12,
+  // isLoss: false,
+  // referAddress: '১৫০ মিরহাজীবাগ',
+  // referMobile: 1871063074,
+  // referName: 'আলি ভাই',
   const saveNewLoner = React.useCallback(
     async (loneData: ILoner) => {
       loneData.totalInstallment = loneData.loanAmount + loneData.profit;
@@ -522,7 +535,7 @@ const UserScreen = ({navigation}: any) => {
                     onChangeText={text =>
                       setData({...data, mobile: Number(text)})
                     }
-                    value={`${data.mobile}`}
+                    // value={`${data.mobile}`}
                   />
                 </Input>
                 <Input size="lg">
@@ -532,7 +545,7 @@ const UserScreen = ({navigation}: any) => {
                     keyboardType="numeric"
                     textContentType="sublocality"
                     onChangeText={text => setData({...data, nid: Number(text)})}
-                    value={`${data.nid}`}
+                    // value={`${data.nid}`}
                   />
                 </Input>
                 <Input size="lg">
@@ -544,7 +557,7 @@ const UserScreen = ({navigation}: any) => {
                     onChangeText={text =>
                       setData({...data, loanAmount: Number(text)})
                     }
-                    value={`${data.loanAmount}`}
+                    // value={`${data.loanAmount}`}
                   />
                 </Input>
                 <Input size="lg">
@@ -556,7 +569,7 @@ const UserScreen = ({navigation}: any) => {
                     onChangeText={text =>
                       setData({...data, profit: Number(text)})
                     }
-                    value={`${data.profit}`}
+                    // value={`${data.profit}`}
                   />
                 </Input>
                 <Input size="lg">
@@ -568,7 +581,7 @@ const UserScreen = ({navigation}: any) => {
                     onChangeText={text =>
                       setData({...data, extraCharge: Number(text)})
                     }
-                    value={`${data.extraCharge}`}
+                    // value={`${data.extraCharge}`}
                   />
                 </Input>
                 <Input size="lg">
@@ -579,7 +592,7 @@ const UserScreen = ({navigation}: any) => {
                     onChangeText={text =>
                       setData({...data, loanLead: Number(text)})
                     }
-                    value={`${data.loanLead}`}
+                    // value={`${data.loanLead}`}
                   />
                 </Input>
                 <Text
@@ -594,7 +607,7 @@ const UserScreen = ({navigation}: any) => {
                   <InputField
                     placeholder="নাম"
                     size="sm"
-                    keyboardType="numeric"
+                    keyboardType="default"
                     textContentType="name"
                     onChangeText={text => setData({...data, referName: text})}
                     value={`${data.referName}`}
@@ -605,7 +618,7 @@ const UserScreen = ({navigation}: any) => {
                     placeholder="ঠিকানা"
                     size="sm"
                     textContentType="fullStreetAddress"
-                    keyboardType="numeric"
+                    keyboardType="default"
                     onChangeText={text =>
                       setData({...data, referAddress: text})
                     }
@@ -621,7 +634,7 @@ const UserScreen = ({navigation}: any) => {
                     onChangeText={text =>
                       setData({...data, referMobile: Number(text)})
                     }
-                    value={`${data.referMobile}`}
+                    // value={`${data.referMobile}`}
                   />
                 </Input>
               </VStack>
